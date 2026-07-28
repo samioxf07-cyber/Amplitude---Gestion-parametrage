@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amplitude - Gestion paramétrage</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .radio-button {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .radio-button input[type="radio"] {
+            display: none;
+        }
+        
+        .radio-button label {
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .radio-button input[type="radio"]:checked + label {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .radio-oui input[type="radio"]:checked + label {
+            background: #10b981;
+            color: white;
+            border-color: #059669;
+        }
+        
+        .radio-non input[type="radio"]:checked + label {
+            background: #ef4444;
+            color: white;
+            border-color: #dc2626;
+        }
+        
+        .radio-encours input[type="radio"]:checked + label {
+            background: #f59e0b;
+            color: white;
+            border-color: #d97706;
+        }
+        
+        .radio-button label:hover {
+            transform: scale(1.02);
+        }
+        
+        .form-section {
+            border-left: 4px solid #667eea;
+            padding-left: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .form-section h3 {
+            color: #667eea;
+            font-weight: 700;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+        
+        select, input, textarea {
+            transition: all 0.3s ease;
+        }
+        
+        select:focus, input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+        }
+        
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .success-message {
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 10000;
+            animation: slideIn 0.5s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <div class="glass-card p-6 mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800">
+                        <i class="fas fa-building mr-3 text-purple-600"></i>
+                        Amplitude - Gestion paramétrage
+                    </h1>
+                    <p class="text-gray-600 mt-2">Système de gestion des demandes et traitements</p>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <div class="text-right">
+                        <p class="text-sm text-gray-500">Date du jour</p>
+                        <p class="text-lg font-semibold text-gray-800" id="currentDate"></p>
+                    </div>
+                    <div class="flex items-center space-x-4 border-l pl-6">
+                        <div class="text-right">
+                            <p class="text-sm text-gray-500">Utilisateur connecté</p>
+                            <p class="text-lg font-semibold text-purple-600" id="currentUserDisplay"></p>
+                        </div>
+                        <a href="affectation-formulaire.html" class="text-purple-600 hover:text-purple-800 flex items-center">
+                            <i class="fas fa-user-plus mr-2"></i>Gestion Affectation
+                        </a>
+                        <button type="button" id="btnLogout"
+                            class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-all flex items-center">
+                            <i class="fas fa-sign-out-alt mr-2"></i>Déconnexion
+                        </button>
+                        <button type="button" id="btnChangePassword"
+                            class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all flex items-center">
+                            <i class="fas fa-key mr-2"></i>Modifier mot de passe
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulaire Principal -->
+        <div class="glass-card p-8">
+            <form id="mainForm">
+                <!-- Section 1: Informations Générales -->
+                <div class="form-section">
+                    <h3><i class="fas fa-info-circle mr-2"></i>Informations Générales</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Date Demande *</label>
+                            <input type="date" id="dateDemande" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Région *</label>
+                            <select id="region" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                                <option value="">Sélectionner une région</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Supervision *</label>
+                            <select id="supervision" required disabled
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 bg-gray-100">
+                                <option value="">Sélectionner d'abord une région</option>
+                            </select>
+                        </div>
+                        
+                        <div class="md:col-span-3">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Agence *</label>
+                            <select id="agence" required disabled
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 bg-gray-100">
+                                <option value="">Sélectionner d'abord une supervision</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Gestionnaires -->
+                <div class="form-section">
+                    <h3><i class="fas fa-users mr-2"></i>Gestionnaires</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Gestionnaire Entrant *</label>
+                            <select id="gestionnaireEntrant" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                                <option value="">Sélectionner un gestionnaire</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Gestionnaire Sortant *</label>
+                            <select id="gestionnaireSortant" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                                <option value="">Sélectionner un gestionnaire</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <button type="button" id="importGestionnaires" 
+                            class="text-sm text-purple-600 hover:text-purple-800 underline">
+                            <i class="fas fa-file-excel mr-1"></i>Importer gestionnaires depuis Excel
+                        </button>
+                        <input type="file" id="gestionnairesFile" accept=".xlsx,.xls,.csv" class="hidden">
+                    </div>
+                </div>
+
+                <!-- Section 3: Détails Intérimaire -->
+                <div class="form-section">
+                    <h3><i class="fas fa-user-tie mr-2"></i>Détails Intérimaire</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Agence Intérimaire *</label>
+                            <input type="text" id="agenceInterimaire" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                                placeholder="Nom de l'agence intérimaire">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Caisse Agent (1-11) *</label>
+                            <select id="caisseAgent" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                                <option value="">Sélectionner</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Classe PV *</label>
+                            <select id="classePV" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                                <option value="">Sélectionner une classe</option>
+                                <option value="C1">C1</option>
+                                <option value="C2">C2</option>
+                                <option value="C3">C3</option>
+                                <option value="C4">C4</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 4: Motifs -->
+                <div class="form-section">
+                    <h3><i class="fas fa-list-alt mr-2"></i>Motifs</h3>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Motif *</label>
+                        <select id="motif" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                            <option value="">Sélectionner un motif</option>
+                            <option value="maladie">Maladie</option>
+                            <option value="conge">Congé</option>
+                            <option value="bon_sortie">Bon Sortie</option>
+                            <option value="formation">Formation</option>
+                            <option value="mission">Mission</option>
+                            <option value="mutation">Mutation</option>
+                            <option value="depart_retraite">Départ Retraite</option>
+                            <option value="demission">Démission</option>
+                            <option value="rupture_contrat">Rupture Contrat</option>
+                            <option value="absence">Absence</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Section 5: Pièce Jointe -->
+                <div class="form-section">
+                    <h3><i class="fas fa-paperclip mr-2"></i>Pièce Jointe</h3>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Joindre la demande reçue</label>
+                        <input type="file" id="pieceJointe" 
+                            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.xlsx,.xls"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100">
+                        <p class="text-xs text-gray-500 mt-2">Formats acceptés: PDF, DOC, DOCX, JPG, PNG, XLS, XLSX (max 10MB)</p>
+                        <div id="fileInfo" class="mt-2 text-sm text-green-600 hidden">
+                            <i class="fas fa-check-circle mr-1"></i>
+                            <span id="fileName"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 6: Contact -->
+                <div class="form-section">
+                    <h3><i class="fas fa-envelope mr-2"></i>Contact</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                            <input type="email" id="email" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                                placeholder="email@exemple.com">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Téléphone *</label>
+                            <input type="tel" id="telephone" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                                placeholder="+212 6XX XXX XXX">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Agence Contact</label>
+                            <input type="text" id="agenceContact"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                                placeholder="Agence de contact">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 6: Statut de Traitement -->
+                <div class="form-section">
+                    <h3><i class="fas fa-tasks mr-2"></i>Statut de Traitement</h3>
+                    
+                    <div class="flex space-x-4">
+                        <div class="radio-button radio-oui">
+                            <input type="radio" name="traite" id="traiteOui" value="oui">
+                            <label for="traiteOui">
+                                <i class="fas fa-check mr-2"></i>Oui
+                            </label>
+                        </div>
+                        
+                        <div class="radio-button radio-non">
+                            <input type="radio" name="traite" id="traiteNon" value="non">
+                            <label for="traiteNon">
+                                <i class="fas fa-times mr-2"></i>Non
+                            </label>
+                        </div>
+                        
+                        <div class="radio-button radio-encours">
+                            <input type="radio" name="traite" id="traiteEncours" value="encours">
+                            <label for="traiteEncours">
+                                <i class="fas fa-spinner mr-2"></i>En Cours
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 7: Traitement -->
+                <div class="form-section">
+                    <h3><i class="fas fa-calendar-check mr-2"></i>Traitement</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Début intérim</label>
+                            <input type="date" id="dateDebutInterim"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Fin intérim</label>
+                            <input type="date" id="dateTraitement"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Jours ouvrés</label>
+                            <input type="text" id="joursOuvres" readonly
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-100 focus:ring-2 focus:ring-purple-500"
+                                placeholder="Calcul automatique">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Observation</label>
+                            <textarea id="observation" rows="3"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                                placeholder="Ajoutez vos observations ici..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Boutons d'action -->
+                <div class="flex flex-wrap gap-4 mt-8">
+                    <button type="button" id="btnSave"
+                        class="btn-primary text-white px-8 py-3 rounded-lg font-semibold flex items-center">
+                        <i class="fas fa-save mr-2"></i>Sauvegarder
+                    </button>
+                    
+                    <button type="button" id="btnEmail"
+                        class="bg-blue-500 text-white px-8 py-3 rounded-lg font-semibold flex items-center hover:bg-blue-600 transition-all">
+                        <i class="fas fa-envelope mr-2"></i>Générer Email
+                    </button>
+                    
+                    <button type="button" id="btnExport"
+                        class="btn-secondary text-white px-8 py-3 rounded-lg font-semibold flex items-center">
+                        <i class="fas fa-file-excel mr-2"></i>Exporter Excel
+                    </button>
+
+                    <button type="button" id="btnClearAccumulated"
+                        class="bg-orange-500 text-white px-8 py-3 rounded-lg font-semibold flex items-center hover:bg-orange-600 transition-all">
+                        <i class="fas fa-trash mr-2"></i>Vider Accumulation
+                    </button>
+
+                    <button type="button" id="btnReset"
+                        class="bg-gray-500 text-white px-8 py-3 rounded-lg font-semibold flex items-center hover:bg-gray-600 transition-all">
+                        <i class="fas fa-redo mr-2"></i>Réinitialiser
+                    </button>
+                </div>
+
+                <!-- Section lien email (caché par défaut) -->
+                <div id="emailLinkSection" class="mt-6 hidden">
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <h4 class="font-semibold text-blue-800 mb-2"><i class="fas fa-link mr-2"></i>Lien Email Généré</h4>
+                        <p class="text-sm text-blue-600 mb-3">Cliquez sur le lien ci-dessous pour ouvrir votre client email:</p>
+                        <a id="emailLink" href="#" class="inline-block bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-all mb-3">
+                            <i class="fas fa-envelope-open mr-2"></i>Ouvrir Client Email
+                        </a>
+                        
+                        <div class="border-t border-blue-200 pt-3 mt-3">
+                            <h4 class="font-semibold text-blue-800 mb-2"><i class="fas fa-copy mr-2"></i>Copier le Contenu</h4>
+                            <p class="text-sm text-blue-600 mb-3">Si le lien ne fonctionne pas, copiez le contenu et collez-le dans votre email:</p>
+                            
+                            <textarea id="emailContent" rows="10" readonly
+                                class="w-full px-4 py-3 border border-blue-300 rounded-lg bg-white text-sm font-mono"></textarea>
+                            
+                            <button type="button" id="btnCopyEmail" 
+                                class="mt-3 bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 transition-all">
+                                <i class="fas fa-copy mr-2"></i>Copier dans le Presse-papiers
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Footer -->
+        <div class="glass-card p-6 mt-8 text-center">
+            <p class="text-gray-600">
+                <i class="fas fa-shield-alt mr-2"></i>
+                Système Intranet Sécurisé - © 2026
+            </p>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div class="loading" id="loadingSpinner">
+        <div class="text-center">
+            <div class="spinner mx-auto mb-4"></div>
+            <p class="text-white text-lg">Traitement en cours...</p>
+        </div>
+    </div>
+
+    <!-- Success Message -->
+    <div class="success-message" id="successMessage">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle text-2xl mr-3"></i>
+            <div>
+                <p class="font-semibold">Succès!</p>
+                <p class="text-sm" id="successTextOpération effectuée avec succès</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="data.js"></script>
+    <script>
+        // Vérifier l'authentification
+        function checkAuthentication() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            if (!currentUser.username) {
+                window.location.href = 'auth.html';
+                return false;
+            }
+            return true;
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Vérifier l'authentification avant de charger la page
+            if (!checkAuthentication()) {
+                return;
+            }
+            
+            initializeDate();
+            initializeCascades();
+            initializeGestionnaires();
+            initializeEventListeners();
+            emailjs.init(EMAIL_CONFIG.PUBLIC_KEY);
+            displayUserInfo();
+        });
+
+        // Initialiser la date du jour
+        function initializeDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('dateDemande').value = today;
+            document.getElementById('currentDate').textContent = new Date().toLocaleDateString('fr-FR', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            // Ajouter les écouteurs d'événements pour le calcul des jours ouvrés
+            document.getElementById('dateDebutInterim').addEventListener('change', calculateJoursOuvres);
+            document.getElementById('dateTraitement').addEventListener('change', calculateJoursOuvres);
+        }
+
+        // Calculer les jours fériés marocains pour une année donnée
+        function getMoroccanHolidays(year) {
+            const holidays = [
+                // Jours fériés fixes
+                { month: 0, day: 1, name: "Nouvel An" },           // 1er janvier
+                { month: 0, day: 11, name: "Manifeste de l'Indépendance" }, // 11 janvier
+                { month: 4, day: 1, name: "Fête du Travail" },     // 1er mai
+                { month: 4, day: 30, name: "Fête du Trône" },      // 30 mai
+                { month: 7, day: 14, name: "Fête de la Révolution du Roi et du Peuple" }, // 14 août
+                { month: 7, day: 20, name: "Fête de la Révolution du Roi et du Peuple" }, // 20 août
+                { month: 7, day: 21, name: "Fête de la Jeunesse" }, // 21 août
+                { month: 10, day: 6, name: "Marche Verte" },        // 6 novembre
+                { month: 10, day: 18, name: "Fête de l'Indépendance" } // 18 novembre
+            ];
+
+            // Calculer les dates mobiles (basées sur le calendrier lunaire)
+            // Ces dates sont approximatives et changent chaque année
+            const lunarHolidays = calculateLunarHolidays(year);
+
+            return [...holidays, ...lunarHolidays];
+        }
+
+        // Calculer les jours fériés mobiles (calendrier lunaire)
+        function calculateLunarHolidays(year) {
+            // Ces dates sont approximatives et doivent être ajustées chaque année
+            // Pour une application de production, utilisez une API ou une bibliothèque spécialisée
+            const lunarHolidays = [];
+
+            // Aïd el-Fitr (approximatif)
+            const aidElFitr = new Date(year, 3, 10); // Avril (exemple)
+            lunarHolidays.push({ date: aidElFitr, name: "Aïd el-Fitr" });
+
+            // Aïd el-Adha (approximatif)
+            const aidElAdha = new Date(year, 5, 17); // Juin (exemple)
+            lunarHolidays.push({ date: aidElAdha, name: "Aïd el-Adha" });
+
+            // 1er Muharram (Nouvel An musulman)
+            const muharram = new Date(year, 6, 19); // Juillet (exemple)
+            lunarHolidays.push({ date: muharram, name: "1er Muharram" });
+
+            // Mawlid (Naissance du Prophète)
+            const mawlid = new Date(year, 8, 28); // Septembre (exemple)
+            lunarHolidays.push({ date: mawlid, name: "Mawlid" });
+
+            return lunarHolidays;
+        }
+
+        // Vérifier si une date est un jour férié
+        function isHoliday(date, holidays) {
+            const dateStr = date.toISOString().split('T')[0];
+
+            // Vérifier les jours fériés fixes
+            for (const holiday of holidays) {
+                if (holiday.date) {
+                    // Jours fériés mobiles
+                    if (holiday.date.toISOString().split('T')[0] === dateStr) {
+                        return true;
+                    }
+                } else {
+                    // Jours fériés fixes
+                    if (date.getMonth() === holiday.month && date.getDate() === holiday.day) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        // Vérifier si une date est un week-end (samedi ou dimanche)
+        function isWeekend(date) {
+            const day = date.getDay();
+            return day === 0 || day === 6; // 0 = dimanche, 6 = samedi
+        }
+
+        // Calculer le nombre de jours ouvrés entre deux dates
+        function calculateJoursOuvres() {
+            const dateDebut = document.getElementById('dateDebutInterim').value;
+            const dateFin = document.getElementById('dateTraitement').value;
+
+            if (!dateDebut || !dateFin) {
+                document.getElementById('joursOuvres').value = '';
+                return;
+            }
+
+            const startDate = new Date(dateDebut);
+            const endDate = new Date(dateFin);
+
+            if (startDate > endDate) {
+                document.getElementById('joursOuvres').value = 'Dates invalides';
+                return;
+            }
+
+            const year = startDate.getFullYear();
+            const holidays = getMoroccanHolidays(year);
+
+            let workingDays = 0;
+            let currentDate = new Date(startDate);
+
+            while (currentDate <= endDate) {
+                if (!isWeekend(currentDate) && !isHoliday(currentDate, holidays)) {
+                    workingDays++;
+                }
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+
+            document.getElementById('joursOuvres').value = workingDays + ' jour(s)';
+        }
+
+        // Initialiser les cascades
+        function initializeCascades() {
+            const regionSelect = document.getElementById('region');
+            const supervisionSelect = document.getElementById('supervision');
+            const agenceSelect = document.getElementById('agence');
+
+            // Charger les régions
+            CASCADE_DATA.regions.forEach(region => {
+                const option = document.createElement('option');
+                option.value = region.id;
+                option.textContent = region.nom;
+                regionSelect.appendChild(option);
+            });
+
+            // Événement changement région
+            regionSelect.addEventListener('change', function() {
+                supervisionSelect.innerHTML = '<option value="">Sélectionner une supervision</option>';
+                agenceSelect.innerHTML = '<option value="">Sélectionner d\'abord une supervision</option>';
+                agenceSelect.disabled = true;
+
+                if (this.value) {
+                    const supervisions = CASCADE_DATA.supervisions[this.value];
+                    supervisions.forEach(sup => {
+                        const option = document.createElement('option');
+                        option.value = sup.id;
+                        option.textContent = sup.nom;
+                        supervisionSelect.appendChild(option);
+                    });
+                    supervisionSelect.disabled = false;
+                } else {
+                    supervisionSelect.disabled = true;
+                }
+            });
+
+            // Événement changement supervision
+            supervisionSelect.addEventListener('change', function() {
+                agenceSelect.innerHTML = '<option value="">Sélectionner une agence</option>';
+
+                if (this.value) {
+                    const agences = CASCADE_DATA.agences[this.value];
+                    agences.forEach(ag => {
+                        const option = document.createElement('option');
+                        option.value = ag.id;
+                        option.textContent = ag.nom;
+                        agenceSelect.appendChild(option);
+                    });
+                    agenceSelect.disabled = false;
+                } else {
+                    agenceSelect.disabled = true;
+                }
+            });
+        }
+
+        // Initialiser les gestionnaires
+        function initializeGestionnaires() {
+            const gestionnaireEntrant = document.getElementById('gestionnaireEntrant');
+            const gestionnaireSortant = document.getElementById('gestionnaireSortant');
+
+            DEFAULT_GESTIONNAIRES.forEach(gestionnaire => {
+                const option1 = document.createElement('option');
+                option1.value = gestionnaire;
+                option1.textContent = gestionnaire;
+                gestionnaireEntrant.appendChild(option1);
+
+                const option2 = document.createElement('option');
+                option2.value = gestionnaire;
+                option2.textContent = gestionnaire;
+                gestionnaireSortant.appendChild(option2);
+            });
+
+            // Ajouter l'écouteur d'événement pour vérifier l'utilisation du gestionnaire
+            gestionnaireEntrant.addEventListener('change', checkGestionnaireUsage);
+        }
+
+        // Vérifier l'utilisation du gestionnaire dans l'année en cours
+        function checkGestionnaireUsage() {
+            const gestionnaire = document.getElementById('gestionnaireEntrant').value;
+            if (!gestionnaire) return;
+
+            const currentYear = new Date().getFullYear();
+            const accumulatedData = JSON.parse(localStorage.getItem('accumulatedExports') || '[]');
+
+            // Compter combien de fois ce gestionnaire a été utilisé cette année
+            let usageCount = 0;
+            accumulatedData.forEach(record => {
+                if (record.gestionnaireEntrant === gestionnaire) {
+                    const recordDate = new Date(record.dateDemande);
+                    if (recordDate.getFullYear() === currentYear) {
+                        usageCount++;
+                    }
+                }
+            });
+
+            // Afficher un avertissement si l'utilisation dépasse 2 fois
+            if (usageCount >= 2) {
+                const warningMessage = `⚠️ Attention: Le gestionnaire "${gestionnaire}" a déjà été utilisé ${usageCount} fois cette année. Veuillez vérifier avant de continuer.`;
+                alert(warningMessage);
+            }
+        }
+
+        // Initialiser les écouteurs d'événements
+        function initializeEventListeners() {
+            document.getElementById('importGestionnaires').addEventListener('click', function() {
+                document.getElementById('gestionnairesFile').click();
+            });
+
+            document.getElementById('gestionnairesFile').addEventListener('change', handleGestionnairesImport);
+            document.getElementById('pieceJointe').addEventListener('change', handlePieceJointe);
+            document.getElementById('btnSave').addEventListener('click', handleSave);
+            document.getElementById('btnEmail').addEventListener('click', handleEmail);
+            document.getElementById('btnCopyEmail').addEventListener('click', copyEmailContent);
+            document.getElementById('btnExport').addEventListener('click', handleExport);
+            document.getElementById('btnClearAccumulated').addEventListener('click', handleClearAccumulated);
+            document.getElementById('btnReset').addEventListener('click', handleReset);
+            document.getElementById('btnLogout').addEventListener('click', handleLogout);
+            document.getElementById('btnChangePassword').addEventListener('click', handleChangePasswordClick);
+        }
+
+        // Afficher les informations de l'utilisateur connecté
+        function displayUserInfo() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            if (currentUser.username) {
+                document.getElementById('currentUserDisplay').textContent = currentUser.username;
+            }
+        }
+
+        // Gérer la déconnexion
+        function handleLogout() {
+            if (confirm('Êtes-vous sûr de vouloir vous déconnecter?')) {
+                localStorage.removeItem('currentUser');
+                window.location.href = 'auth.html';
+            }
+        }
+
+        // Gérer le clic sur le bouton de modification de mot de passe
+        function handleChangePasswordClick() {
+            window.location.href = 'auth.html?changePassword=true';
+        }
+
+        // Importer gestionnaires depuis Excel
+        function handleGestionnairesImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+
+                if (jsonData.length > 0) {
+                    const gestionnaireEntrant = document.getElementById('gestionnaireEntrant');
+                    const gestionnaireSortant = document.getElementById('gestionnaireSortant');
+
+                    // Garder la première option
+                    gestionnaireEntrant.innerHTML = '<option value="">Sélectionner un gestionnaire</option>';
+                    gestionnaireSortant.innerHTML = '<option value="">Sélectionner un gestionnaire</option>';
+
+                    // Ajouter les gestionnaires importés
+                    jsonData.forEach(row => {
+                        if (row[0]) {
+                            const option1 = document.createElement('option');
+                            option1.value = row[0];
+                            option1.textContent = row[0];
+                            gestionnaireEntrant.appendChild(option1);
+
+                            const option2 = document.createElement('option');
+                            option2.value = row[0];
+                            option2.textContent = row[0];
+                            gestionnaireSortant.appendChild(option2);
+                        }
+                    });
+
+                    showSuccess('Gestionnaires importés avec succès!');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // Gérer la pièce jointe
+        function handlePieceJointe(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Vérifier la taille du fichier (max 10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                alert('Le fichier dépasse la taille maximale de 10MB');
+                event.target.value = '';
+                return;
+            }
+
+            // Afficher le nom du fichier
+            document.getElementById('fileInfo').classList.remove('hidden');
+            document.getElementById('fileName').textContent = file.name + ' (' + formatFileSize(file.size) + ')';
+        }
+
+        // Formater la taille du fichier
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        // Sauvegarder les données localement
+        function handleSave() {
+            const pieceJointeInput = document.getElementById('pieceJointe');
+            const pieceJointeFile = pieceJointeInput.files[0];
+
+            const formData = {
+                dateDemande: document.getElementById('dateDemande').value,
+                region: document.getElementById('region').options[document.getElementById('region').selectedIndex].text,
+                supervision: document.getElementById('supervision').options[document.getElementById('supervision').selectedIndex].text,
+                agence: document.getElementById('agence').options[document.getElementById('agence').selectedIndex].text,
+                gestionnaireEntrant: document.getElementById('gestionnaireEntrant').value,
+                gestionnaireSortant: document.getElementById('gestionnaireSortant').value,
+                agenceInterimaire: document.getElementById('agenceInterimaire').value,
+                caisseAgent: document.getElementById('caisseAgent').value,
+                classePV: document.getElementById('classePV').value,
+                motif: document.getElementById('motif').options[document.getElementById('motif').selectedIndex].text,
+                email: document.getElementById('email').value,
+                telephone: document.getElementById('telephone').value,
+                agenceContact: document.getElementById('agenceContact').value,
+                traite: document.querySelector('input[name="traite"]:checked')?.value || 'non',
+                dateDebutInterim: document.getElementById('dateDebutInterim').value,
+                dateTraitement: document.getElementById('dateTraitement').value,
+                joursOuvres: document.getElementById('joursOuvres').value,
+                observation: document.getElementById('observation').value,
+                pieceJointeNom: pieceJointeFile ? pieceJointeFile.name : '',
+                pieceJointeTaille: pieceJointeFile ? formatFileSize(pieceJointeFile.size) : ''
+            };
+
+            // Validation basique
+            if (!formData.dateDemande || !formData.region || !formData.gestionnaireEntrant) {
+                alert('Veuillez remplir les champs obligatoires');
+                return;
+            }
+
+            saveToLocalStorage(formData);
+            showSuccess('Données sauvegardées avec succès!');
+        }
+
+        // Ouvrir le client email par défaut
+        function handleEmail() {
+            const pieceJointeInput = document.getElementById('pieceJointe');
+            const pieceJointeFile = pieceJointeInput.files[0];
+
+            const formData = {
+                dateDemande: document.getElementById('dateDemande').value,
+                region: document.getElementById('region').options[document.getElementById('region').selectedIndex].text,
+                supervision: document.getElementById('supervision').options[document.getElementById('supervision').selectedIndex].text,
+                agence: document.getElementById('agence').options[document.getElementById('agence').selectedIndex].text,
+                gestionnaireEntrant: document.getElementById('gestionnaireEntrant').value,
+                gestionnaireSortant: document.getElementById('gestionnaireSortant').value,
+                agenceInterimaire: document.getElementById('agenceInterimaire').value,
+                caisseAgent: document.getElementById('caisseAgent').value,
+                classePV: document.getElementById('classePV').value,
+                motif: document.getElementById('motif').options[document.getElementById('motif').selectedIndex].text,
+                email: document.getElementById('email').value,
+                telephone: document.getElementById('telephone').value,
+                agenceContact: document.getElementById('agenceContact').value,
+                traite: document.querySelector('input[name="traite"]:checked')?.value || 'non',
+                dateDebutInterim: document.getElementById('dateDebutInterim').value,
+                dateTraitement: document.getElementById('dateTraitement').value,
+                joursOuvres: document.getElementById('joursOuvres').value,
+                observation: document.getElementById('observation').value,
+                pieceJointeNom: pieceJointeFile ? pieceJointeFile.name : '',
+                pieceJointeTaille: pieceJointeFile ? formatFileSize(pieceJointeFile.size) : ''
+            };
+
+            // Validation basique
+            if (!formData.dateDemande || !formData.region || !formData.gestionnaireEntrant) {
+                alert('Veuillez remplir les champs obligatoires');
+                return;
+            }
+
+            // Créer le corps du email en texte simple
+            let body = `NOUVELLE DEMANDE INTRANET
+Date: ${formData.dateDemande}
+
+INFORMATIONS GÉNÉRALES
+Date Demande: ${formData.dateDemande}
+Région: ${formData.region}
+Supervision: ${formData.supervision}
+Agence: ${formData.agence}
+
+GESTIONNAIRES
+Gestionnaire Entrant: ${formData.gestionnaireEntrant}
+Gestionnaire Sortant: ${formData.gestionnaireSortant}
+
+DÉTAILS INTÉRIMAIRE
+Agence Intérimaire: ${formData.agenceInterimaire}
+Caisse Agent: ${formData.caisseAgent}
+Classe PV: ${formData.classePV}
+Motif: ${formData.motif}`;
+
+            // Ajouter la pièce jointe si présente
+            if (formData.pieceJointeNom) {
+                body += `
+
+PIÈCE JOINTE
+Fichier: ${formData.pieceJointeNom}
+Taille: ${formData.pieceJointeTaille}
+Note: Veuillez joindre le fichier "${formData.pieceJointeNom}" à cet email`;
+            }
+
+            body += `
+
+CONTACT
+Email: ${formData.email}
+Téléphone: ${formData.telephone}
+Agence Contact: ${formData.agenceContact}
+
+TRAITEMENT
+Traité: ${formData.traite.toUpperCase()}
+Début intérim: ${formData.dateDebutInterim || 'Non définie'}
+Fin intérim: ${formData.dateTraitement || 'Non définie'}
+Jours ouvrés: ${formData.joursOuvres || 'Non calculé'}
+Observation: ${formData.observation || 'Aucune'}`;
+
+            // Ouvrir le client email par défaut
+            const mailtoLink = `mailto:${EMAIL_CONFIG.RECIPIENT_EMAIL}?subject=Nouvelle Demande Intranet - ${formData.dateDemande}&body=${encodeURIComponent(body)}`;
+
+            // Essayer d'ouvrir le client email avec différentes méthodes
+            try {
+                // Méthode 1: window.open (nouvelle fenêtre)
+                const emailWindow = window.open(mailtoLink, '_blank');
+                if (emailWindow) {
+                    emailWindow.focus();
+                } else {
+                    // Méthode 2: window.location.href si window.open est bloqué
+                    window.location.href = mailtoLink;
+                }
+            } catch (e) {
+                // Méthode 3: fallback avec window.location.href
+                window.location.href = mailtoLink;
+            }
+
+            // Afficher également le lien email pour l'utilisateur
+            document.getElementById('emailLinkSection').classList.remove('hidden');
+            document.getElementById('emailLink').href = mailtoLink;
+
+            // Afficher le contenu email dans la textarea
+            document.getElementById('emailContent').value = body;
+
+            showSuccess('Client email ouvert! Si cela ne fonctionne pas, cliquez sur le lien affiché ou copiez le contenu.');
+        }
+
+        // Copier le contenu email dans le presse-papiers
+        function copyEmailContent() {
+            const emailContent = document.getElementById('emailContent');
+            
+            // Sélectionner le texte
+            emailContent.select();
+            emailContent.setSelectionRange(0, 99999); // Pour mobile
+            
+           try {
+                // Copier dans le presse-papiers
+                navigator.clipboard.writeText(emailContent.value).then(function() {
+                    showSuccess('Contenu copié dans le presse-papiers!');
+                }).catch(function(err) {
+                    // Fallback pour les navigateurs plus anciens
+                    document.execCommand('copy');
+                    showSuccess('Contenu copié dans le presse-papiers!');
+                });
+            } catch (err) {
+                // Fallback pour les navigateurs plus anciens
+                document.execCommand('copy');
+                showSuccess('Contenu copié dans le presse-papiers!');
+            }
+        }
+
+        // Générer le contenu HTML de l'email (version optimisée et légère)
+        function generateEmailHTML(formData) {
+            let pieceJointeSection = '';
+            if (formData.pieceJointeNom) {
+                pieceJointeSection = `
+                            <tr style="background: #667eea; color: white;"><td colspan="2" style="padding: 10px; font-weight: bold;">Pièce Jointe</td></tr>
+                            <tr><td style="padding: 8px; font-weight: bold; background: #fff;">Fichier:</td><td style="padding: 8px; background: #fff;">${formData.pieceJointeNom}</td></tr>
+                            <tr><td style="padding: 8px; font-weight: bold; background: #fff;">Taille:</td><td style="padding: 8px; background: #fff;">${formData.pieceJointeTaille}</td></tr>
+                `;
+            }
+
+            return `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <div style="background: #667eea; color: white; padding: 20px; text-align: center;">
+                        <h1 style="margin: 0; font-size: 20px;">NOUVELLE DEMANDE INTRANET</h1>
+                        <p style="margin: 5px 0 0 0; opacity: 0.9;">Date: ${formData.dateDemande}</p>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 20px;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                            <tr style="background: #667eea; color: white;"><td colspan="2" style="padding: 10px; font-weight: bold;">Informations Générales</td></tr>
+                            <tr><td style="padding: 8px; font-weight: bold; background: #fff;">Date:</td><td style="padding: 8px; background: #fff;">${formData.dateDemande}</td></tr>
+                            <tr><td style="padding: 8px; font-weight: bold; background: #fff;">Région:</td><td style="padding: 8px; background: #fff;">${formData.region}</td></tr>
+                            <tr><td style="padding: 8px; font-weight: bold; background: #fff;">Supervision:</td><td style="padding: 8px; background: #fff;">${formData.supervision}</td></tr>
+                            <tr><td style="padding: 8px; font-weight: bold; background: #fff;">Agence:</td><td style="padding: 8px; background: #fff;">${formData.agence}</td></tr>
+                            <tr style="background: #667eea; color: white;"><td colspan="2" style="padding: 10px; font-weight: bold;">Gestionnaires</td></tr>
+                            <tr><td style="padding: 8px; font-weight: bold; background: #fff;">Entrant:</td><td style="padding: 8px; background: #fff;">${formData.gestionnaireEntrant}</td></tr>
+                            <tr><td style="padding: 8px; font-weight: bold; background: #fff;">Sortant:</td><td style="padding: 8px; background: #fff;">${formData.gestionnaireSortant}</td></tr>
+                            <tr style="background: #667eea; color: white;"><td colspan="2" style="padding: 10px; font-weight: bold;">Détails Intérimaire</td></tr>
+                            <tr><td style="padding: 8px; font-weight: bold; background: #fff;">Agence Intérimaire:</td><td style="padding: 8px; background: #fff;">${formData.agenceInterimaire}</td></tr>
+                            <tr><td style="padding: 8px; font-weight: bold; background: #fff;">Caisse Agent:</td><td style="padding: 8px; background: #fff;">${formData.caisseAgent}</td></tr>
+                            <tr><td style="padding: 8px; font-weight: bold; background: #fff;">Classe PV:</td><td style="padding: 8px; background: #fff;">${formData.classePV}</td></tr>
+                            <tr><td style="padding: 8px; font-weight: bold; background: #fff;">Motif:</td><td style="padding: 8px; background: #fff;">${formData.motif}</td></tr>
+                            ${pieceJointeSection}
+                            <tr style="background: #667eea; color: white;"><td colspan="2" style="padding: 10px; font-weight: bold;">Contact</td></tr>
+                            <tr><td style="padding: 8px; font-weight: bold; background: #fff;">Email:</td><td style="padding: 8px; background: #fff;">${formData.email}</td></tr>
+                            <tr><td style="padding: 8px; font-weight: bold; background: #fff;">Téléphone:</td><td style="padding: 8px; background: #fff;">${formData.telephone}</td></tr>
+                            <tr><td style="padding: 8px; font-weight: bold; background: #fff;">Agence Contact:</td><td style="padding: 8px; background: #fff;">${formData.agenceContact}</td></tr>
+                            <tr style="background: #667eea; color: white;"><td colspan="2" style="padding: 10px; font-weight: bold;">Traitement</td></tr>
+                            <tr><td style="padding: 8px; font-weight: bold; background: #fff;">Traité:</td><td style="padding: 8px; background: #fff;">${formData.traite.toUpperCase()}</td></tr>
+                            <tr><td style="padding: 8px; font-weight: bold; background: #fff;">Début intérim:</td><td style="padding: 8px; background: #fff;">${formData.dateDebutInterim || 'Non définie'}</td></tr>
+                            <tr><td style="padding: 8px; font-weight: bold; background: #fff;">Fin intérim:</td><td style="padding: 8px; background: #fff;">${formData.dateTraitement || 'Non définie'}</td></tr>
+                            <tr><td style="padding: 8px; font-weight: bold; background: #fff;">Jours ouvrés:</td><td style="padding: 8px; background: #fff;">${formData.joursOuvres || 'Non calculé'}</td></tr>
+                            <tr><td style="padding: 8px; font-weight: bold; background: #fff;">Observation:</td><td style="padding: 8px; background: #fff;">${formData.observation || 'Aucune'}</td></tr>
+                        </table>
+                    </div>
+                    <div style="background: #1f2937; color: white; padding: 15px; text-align: center; font-size: 12px;">
+                        <p style="margin: 0;">Email généré automatiquement - Système Intranet © 2026</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Exporter en Excel
+        function handleExport() {
+            const pieceJointeInput = document.getElementById('pieceJointe');
+            const pieceJointeFile = pieceJointeInput.files[0];
+
+            const formData = {
+                dateDemande: document.getElementById('dateDemande').value,
+                region: document.getElementById('region').options[document.getElementById('region').selectedIndex].text,
+                supervision: document.getElementById('supervision').options[document.getElementById('supervision').selectedIndex].text,
+                agence: document.getElementById('agence').options[document.getElementById('agence').selectedIndex].text,
+                gestionnaireEntrant: document.getElementById('gestionnaireEntrant').value,
+                gestionnaireSortant: document.getElementById('gestionnaireSortant').value,
+                agenceInterimaire: document.getElementById('agenceInterimaire').value,
+                caisseAgent: document.getElementById('caisseAgent').value,
+                classePV: document.getElementById('classePV').value,
+                motif: document.getElementById('motif').options[document.getElementById('motif').selectedIndex].text,
+                email: document.getElementById('email').value,
+                telephone: document.getElementById('telephone').value,
+                agenceContact: document.getElementById('agenceContact').value,
+                traite: document.querySelector('input[name="traite"]:checked')?.value || 'non',
+                dateDebutInterim: document.getElementById('dateDebutInterim').value,
+                dateTraitement: document.getElementById('dateTraitement').value,
+                joursOuvres: document.getElementById('joursOuvres').value,
+                observation: document.getElementById('observation').value,
+                pieceJointeNom: pieceJointeFile ? pieceJointeFile.name : 'Aucune',
+                pieceJointeTaille: pieceJointeFile ? formatFileSize(pieceJointeFile.size) : '-'
+            };
+
+            // Récupérer les données accumulées depuis localStorage
+            let accumulatedData = JSON.parse(localStorage.getItem('accumulatedExports') || '[]');
+            
+            // Ajouter la nouvelle demande aux données accumulées
+            accumulatedData.push(formData);
+            
+            // Sauvegarder les données accumulées dans localStorage
+            localStorage.setItem('accumulatedExports', JSON.stringify(accumulatedData));
+
+            // Exporter toutes les données accumulées
+            const ws = XLSX.utils.json_to_sheet(accumulatedData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Demandes");
+            XLSX.writeFile(wb, "demandes_intranet_accumulees.xlsx");
+            
+            showSuccess('Export Excel réussi! ' + accumulatedData.length + ' demande(s) accumulée(s).');
+        }
+
+        // Vider les données accumulées
+        function handleClearAccumulated() {
+            if (confirm('Êtes-vous sûr de vouloir vider toutes les données accumulées? Cette action est irréversible.')) {
+                localStorage.removeItem('accumulatedExports');
+                showSuccess('Données accumulées vidées avec succès!');
+            }
+        }
+
+        // Réinitialiser le formulaire
+        function handleReset() {
+            document.getElementById('mainForm').reset();
+            initializeDate();
+            document.getElementById('supervision').disabled = true;
+            document.getElementById('agence').disabled = true;
+            document.getElementById('supervision').innerHTML = '<option value="">Sélectionner d\'abord une région</option>';
+            document.getElementById('agence').innerHTML = '<option value="">Sélectionner d\'abord une supervision</option>';
+        }
+
+        // Sauvegarder dans localStorage
+        function saveToLocalStorage(formData) {
+            const savedData = JSON.parse(localStorage.getItem('intranetData') || '[]');
+            savedData.push(formData);
+            localStorage.setItem('intranetData', JSON.stringify(savedData));
+        }
+
+        // Afficher le loading
+        function showLoading() {
+            document.getElementById('loadingSpinner').style.display = 'flex';
+        }
+
+        // Masquer le loading
+        function hideLoading() {
+            document.getElementById('loadingSpinner').style.display = 'none';
+        }
+
+        // Afficher le message de succès
+        function showSuccess(message) {
+            const successMessage = document.getElementById('successMessage');
+            document.getElementById('successText').textContent = message;
+            successMessage.style.display = 'block';
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
