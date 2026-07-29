@@ -531,7 +531,171 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="data.js"></script>
+    <script>
+        // Données en cascade pour l'intranet
+        // Configuration EmailJS
+        const EMAIL_CONFIG = {
+            SERVICE_ID: 'service_upuge9d',
+            TEMPLATE_ID: 'template_upuge9d',
+            PUBLIC_KEY: 'nheWjZ1-MBf7R-96SEY',
+            RECIPIENT_EMAIL: 'TWGServiceParametrageMassarcom@Fbpmc.ma'
+        };
+
+        const CASCADE_DATA = {
+            regions: [
+                { id: 1, nom: 'Région Nord' },
+                { id: 2, nom: 'Région Sud' },
+                { id: 3, nom: 'Région Oriental' },
+                { id: 4, nom: 'Région Casa Nord' },
+                { id: 5, nom: 'Région Casa Centre' },
+                { id: 6, nom: 'Région Doukkala abda'},
+                { id: 7, nom: 'El haouz marrakech'},
+                { id: 8, nom: 'Région CASA SUD'},
+                { id: 9, nom: 'Tadla Ordigha'},
+                { id: 10, nom: 'Fés Méknes'},
+                { id: 11, nom: 'Rabat Zemour Zaer'},
+                { id: 12, nom: 'Sale Gharb'}
+            ],
+            supervisions: {
+                1: [
+                    { id: 1, nom: 'Supervision Tanger' },
+                    { id: 2, nom: 'Supervision Tétouan' },
+                    { id: 3, nom: 'Supervision Larache' },
+                    { id: 4, nom: 'Ouazzane'}
+                ],
+                2: [
+                    { id: 5, nom: 'Supervision Agadir' },
+                    { id: 6, nom: 'Supervision Sahara' },
+                    { id: 7, nom: 'Supervision Ouarzazate' },
+                    { id: 8, nom: 'Supervision tiznit'},
+                    { id: 9, nom: 'Supervision ait melloul'},
+                    { id: 10, nom: 'Supervision Taroudant'}
+                ],
+                3: [
+                    { id: 11, nom: 'Supervision Oujda' },
+                    { id: 12, nom: 'Supervision Nador' },
+                    { id: 13, nom: 'Supervision Taza'},
+                    { id: 14, nom: 'Ssupervision Berkane'}
+                ],
+                4: [
+                    { id: 15, nom: 'Supervision Zenata Bernoussi' },
+                    { id: 16, nom: 'Supervision Casa Anfa' },
+                    { id: 17, nom: 'Supervision Casa Maârif' },
+                    { id: 18, nom: 'Supervision Mohammedia' }
+                ],
+                5: [
+                    { id: 19, nom: 'Supervision Centre' },
+                    { id: 20, nom: 'Supervision Sidi Maârouf' },
+                    { id: 21, nom: 'Supervision Roches Noires' }
+                ],
+                6: [
+                    { id: 22, nom: 'Supervision Safi' },
+                    { id: 23, nom: 'Supervision El Jadida' },
+                    { id: 24, nom: 'Supervision Sidi Bennour' }
+                ],
+                7: [
+                    { id: 25, nom: 'Supervision Marrakech Centre' },
+                    { id: 26, nom: 'Supervision Menara' },
+                    { id: 27, nom: 'Supervision Guéliz' }
+                ],
+                8: [
+                    { id: 28, nom: 'Supervision Casa Sud' },
+                    { id: 29, nom: 'Supervision Temara' },
+                    { id: 30, nom: 'Supervision Skhirat' }
+                ],
+                9: [
+                    { id: 31, nom: 'Supervision Beni Mellal' },
+                    { id: 32, nom: 'Supervision Khouribga' }
+                ],
+                10: [
+                    { id: 33, nom: 'Supervision Fès' },
+                    { id: 34, nom: 'Supervision Meknès' }
+                ],
+                11: [
+                    { id: 35, nom: 'Supervision Rabat' },
+                    { id: 36, nom: 'Supervision Salé' }
+                ],
+                12: [
+                    { id: 37, nom: 'Supervision Kénitra' },
+                    { id: 38, nom: 'Supervision Sidi Kacem' }
+                ]
+            },
+            agences: {
+                1: [
+                    { id: 1, nom: 'Agence Tanger Beni Makada' },
+                    { id: 2, nom: 'Agence Tanger Mghougha' },
+                    { id: 3, nom: 'Agence Tanger Aouama'},
+                    { id: 4, nom: 'Agence Tanger AIN KTIOUET'},
+                    { id: 5, nom: 'Agence EL alia'},
+                    { id: 6, nom: 'Agence Casa Barata'},
+                    { id: 7, nom: 'Agence Ben Diban'},
+                    { id: 8, nom: 'Agence Souani'}
+                ],
+                2: [
+                    { id: 9, nom: 'Agence Tétouan Hamama' },
+                    { id: 10, nom: 'Agence Tétouan Romana' },
+                    { id: 11, nom: 'Agence Tétouan Saniat Rmel'},
+                    { id: 12, nom: 'Agence Tétouan EL Mandri'}
+                ],
+                3: [
+                    { id: 13, nom: 'Agence larache El Menzeh' },
+                    { id: 14, nom: 'Agence Larach Lexus'},
+                    { id: 15, nom: 'Agence Aouamra'}
+                ],
+                4: [
+                    { id: 16, nom: 'Agence Agadir Centre' },
+                    { id: 17, nom: 'Agence Inezgane El Jihadia' },
+                    { id: 18, nom: 'Agence Tikiouine'},
+                    { id: 19, nom: 'Agence BenSergaou'}
+                ],
+                5: [
+                    { id: 8, nom: 'Agence Agadir Centre' },
+                    { id: 9, nom: 'Agence Inezgane El Jihadia' },
+                    { id: 10, nom: 'Agence Tikiouine' },
+                    { id: 11, nom: 'Agence Bensergaou'}
+                ],
+                6: [
+                    { id: 11, nom: 'Agence Laayoun Boukraa' },
+                    { id: 12, nom: 'Agence Smara' },
+                    { id: 13, nom: 'Agence Boujdour' }
+                ],
+                7: [
+                    { id: 14, nom: 'Agence Marrakech Centre' },
+                    { id: 15, nom: 'Agence Guéliz' },
+                    { id: 16, nom: 'Agence Menara' }
+                ],
+                8: [
+                    { id: 17, nom: 'Agence Casa Sud' },
+                    { id: 18, nom: 'Agence Temara' },
+                    { id: 19, nom: 'Agence Skhirat' }
+                ],
+                9: [
+                    { id: 20, nom: 'Agence Beni Mellal' },
+                    { id: 21, nom: 'Agence Khouribga' }
+                ],
+                10: [
+                    { id: 22, nom: 'Agence Fès' },
+                    { id: 23, nom: 'Agence Meknès' }
+                ],
+                11: [
+                    { id: 24, nom: 'Agence Rabat' },
+                    { id: 25, nom: 'Agence Salé' }
+                ],
+                12: [
+                    { id: 26, nom: 'Agence Kénitra' },
+                    { id: 27, nom: 'Agence Sidi Kacem' }
+                ]
+            }
+        };
+
+        const DEFAULT_GESTIONNAIRES = [
+            'Gestionnaire 1',
+            'Gestionnaire 2',
+            'Gestionnaire 3',
+            'Gestionnaire 4',
+            'Gestionnaire 5'
+        ];
+    </script>
     <script>
         // Vérifier l'authentification
         function checkAuthentication() {
