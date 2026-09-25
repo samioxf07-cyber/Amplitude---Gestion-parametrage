@@ -249,8 +249,777 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="data.js"></script>
     <script>
+        // Données en cascade pour l'intranet
+        const CASCADE_DATA = {
+           regions: [
+                    { id: 1, nom: 'Région Nord' },
+                    { id: 2, nom: 'Région Sud' },
+                    { id: 3, nom: 'Région Oriental' },
+                    { id: 4, nom: 'Région Casa Nord' },
+                    { id: 5, nom: 'Région Casa Centre' },
+                    { id: 6, nom: 'Région Doukkala abda'},
+                    { id: 7, nom: 'Région El haouz marrakech'},
+                    { id: 8, nom: 'Région CASA SUD'},
+                    { id: 9, nom: 'Région Tadla Ordigha'},
+                    { id: 10, nom: 'Région Fés Méknes'},
+                    { id: 11, nom: 'Région Rabat Zemour Zaer'},
+                    { id: 12, nom: 'Région Sale Gharb' }
+                    
+                ],
+                    supervisions: {
+                        1: [
+                            { id: 1, nom: 'Supervision TANGER MEDINA' },
+                            { id: 2, nom: 'Supervision TETOUAN' },
+                            { id: 3, nom: 'Supervision LARACHE AL BOUGHAZ' },
+                            { id: 4, nom: 'Supervision OUAZZANE'}
+                        ],
+                        2: [
+                            { id: 5, nom: 'Supervision AGADIR' },
+                            { id: 6, nom: 'Supervision OUARZAZATE' },
+                            { id: 7, nom: 'Supervision TIZNIT ' },
+                            { id: 8, nom: 'Supervision TAROUDANT'},
+                            { id: 9, nom: 'Supervision SAHARA '},
+                            { id: 10, nom: 'Supervision AIT MELLOUL'}
+                        ],
+                        3: [
+                            { id: 11, nom: 'Supervision OUJDA' },
+                            { id: 12, nom: 'Supervision NADOR' },
+                            { id: 13, nom: 'Supervision TAZA'},
+                            { id: 14, nom: 'Ssupervision BERKANE'}
+                        ],
+                        4: [
+                            { id: 15, nom: 'Supervision BERNOUSSI ZENATA' },
+                            { id: 16, nom: 'Supervision MOHAMMEDIA AIN HARROUDA' },
+                            { id: 17, nom: 'Supervision MOHAMMEDIA BENSLIMANE' }
+                        ],
+                        5: [
+                            { id: 18, nom: 'Supervision BENMSIK SIDI OTHMANE' },
+                            { id: 19, nom: 'Supervision FIDAA SIDI BELYOUT' },
+                            { id: 20, nom: 'Supervision HAY MOHAMMADI' }
+                        ],
+                        6: [
+                            { id: 21, nom: 'Supervision EL JADIDA NORD' },
+                            { id: 22, nom: 'Supervision EL JADIDA SUD' },
+                            { id: 23, nom: 'Supervision ZEMAMRA' },
+                            { id: 24, nom: 'Supervision SAFI' }
+                        ],
+                        7: [
+                            { id: 25, nom: 'Supervision AL HAOUZ' },
+                            { id: 26, nom: 'Supervision CHICHAOUA-ESSAOUIRA' },
+                            { id: 27, nom: 'Supervision RHAMNA' },
+                            { id: 28, nom: 'Supervision MARRAKECH CENTRE' }
+                        ],
+                        8: [
+                            { id: 29, nom: 'Supervision SETTAT BERRECHID' },
+                            { id: 30, nom: 'Supervision BOUSKOURA SIDI RAHAL' },
+                            { id: 31, nom: 'Supervision HASSANI OULFA' }
+                        ],
+                        9: [
+                            { id: 32, nom: 'Supervision OUARDIGHA' },
+                            { id: 33, nom: 'Supervision TADLA' },
+                            { id: 34, nom: 'Supervision ZAYANE' },
+                            { id: 35, nom: 'Supervision AZILAL' }
+                        ],
+                        10: [
+                            { id: 36, nom: 'Supervision Fès Sais' },
+                            { id: 37, nom: 'Supervision Meknès Atlas' },
+                            { id: 38, nom: 'Supervision Errachidia'},
+                            { id: 39, nom: 'Supervision Fès Taounat'},
+                            { id: 40, nom: 'Supervision Meknès El menzeh'}
+                        ],
+                        11: [
+                            { id: 41, nom: 'Supervision Rabat ' },
+                            { id: 42, nom: 'Supervision Temara' },
+                            { id: 43, nom: 'Supervision Tifelt'},
+                            { id: 44, nom: 'Supervision Zaer'}
+                        ],
+                        12: [
+                            { id: 45, nom: 'Supervision Sale nord' },
+                            { id: 46, nom: 'Supervision Sale sud' },
+                            { id: 47, nom: 'Supervision Gharb'},
+                            { id: 48, nom: 'Supervision Kénitra'}
+                        ],
+                        13: [
+                            { id: 49, nom: 'Supervision TAZA ANOUAL' },
+                            { id: 50, nom: 'Supervision GUERCIF SIDI MOUSSA' },
+                            { id: 51, nom: 'Supervision TAZA MOULAY YOUSSEF' },
+                            { id: 52, nom: 'Supervision GUERCIF IBNOU KHALDOUN'},
+                            { id: 53, nom: 'Supervision TAHLA'},
+                            { id: 54, nom: 'Supervision TAZA RIBAT EL KHIR'},
+                            { id: 55, nom: 'Supervision OUED AMLIL'},
+                            { id: 56, nom: 'Supervision TAZA MASSIRA'},
+                            { id: 57, nom: 'Supervision GM OUED AMLIL'}   
+                        ],
+                        14: [
+                            { id: 58, nom: 'Supervision BERKANE CENTRE' },
+                            { id: 59, nom: 'Supervision TAOURIRT CENTRE' },
+                            { id: 60, nom: 'Supervision LAAYOUNE ORIENTALE' },
+                            { id: 61, nom: 'Supervision AHFIR'},
+                            { id: 62, nom: 'Supervision ZAIO'},
+                            { id: 63, nom: 'Supervision BERKANE SIDI SLIMANE'},
+                            { id: 64, nom: 'Supervision BERKANE IBNOU SINA'},
+                            { id: 65, nom: 'Supervision BENI DRAR'},
+                            { id: 66, nom: 'Supervision AKLIM'},
+                            { id: 67, nom: 'Supervision TAOURIRT MLY ALI CHERIF'},
+                            { id: 68, nom: 'Supervision MADAGH'}  
+                        ]
+                    },
+                    agences: {
+                        1: [
+                            { id: 1, nom: 'Agence TANGER BENI MAKADA' },
+                            { id: 2, nom: 'Agence TANGER MGHOUGHA' },
+                            { id: 3, nom: 'Agence TANGER DCHAR AOUAMA'},
+                            { id: 4, nom: 'Agence TANGER AOUAMA'},
+                            { id: 5, nom: 'Agence TANGER EL ALIA'},
+                            { id: 6, nom: 'Agence TANGER BEN DIBANE'},
+                            { id: 7, nom: 'Agence AIN KTIOUET'},
+                            { id: 8, nom: 'Agence TANGER DRADEB'},
+                            { id: 9, nom: 'Agence TANGER SOUANI'},
+                            { id: 10, nom: 'Agence TANGER CASA BARATA'}
+                        ],
+                        2: [
+                            { id: 11, nom: 'Agence TéTOUAN HAMAMA' },
+                            { id: 12, nom: 'Agence M DIQ'},
+                            { id: 13, nom: 'Agence MARTIL'},
+                            { id: 14, nom: 'Agence FNIDEQ'},
+                            { id: 15, nom: 'Agence TETOUAN EL MANDRI'},
+                            { id: 16, nom: 'Agence TETOUAN DHAR MHANECH'},
+                            { id: 17, nom: 'Agence TETOUAN ROMANA'},
+                            { id: 18, nom: 'Agence OUED LAW BAHARA'},
+                            { id: 19, nom: 'Agence GM TETOUAN ROMANA'},
+                            { id: 20, nom: 'Agence BOUJERRAH'}
+                        ],
+                        3: [
+                            { id: 22, nom: 'Agence LARACHE AL MENZAH' },
+                            { id: 23, nom: 'Agence ASSILA'},
+                            { id: 24, nom: 'TANGER MASNANA'},
+                            { id: 25, nom: 'Agence LARACHE LIXUS'},
+                            { id: 26, nom: 'Agence AOUAMRA'},
+                            { id: 27, nom: 'Agence TANGER SIDI DRISS'},
+                            { id: 28, nom: 'Agence TANGER GZENAYA'},
+                            { id: 29, nom: 'Agence GM LARACHE LIXUS'},
+                            { id: 30, nom: 'Agence GM TANGER BOUKHALEF'},
+                            { id: 31, nom: 'Agence LARACHE OUAFAE'},
+                            { id: 32, nom: 'Agence TANGER EL MERS'}
+                        ],
+                        4: [
+                            { id: 33, nom: 'Agence CHEFCHAOUEN' },
+                            { id: 34, nom: 'Agence OUAZZANE ' },
+                            { id: 35, nom: 'Agence KSAR EL KBIR HAY SALAM' },
+                            { id: 36, nom: 'Agence HAD KORT'},
+                            { id: 37, nom: 'Agence KSAR EL KBIR NAHDA'},
+                            { id: 38, nom: 'Agence JORF EL MELHA'},
+                            { id: 39, nom: 'Agence GM CHAOUEN'},
+                            { id: 40, nom: 'Agence KSAR EL KEBIR OULED HMIED'},
+                            { id: 41, nom: 'Agence AIN DFALI'},
+                            { id: 42, nom: 'Agence KHNICHET'}
+                        ],
+                        5: [
+                            { id: 43, nom: 'Agence AGADIR VILLE' },
+                            { id: 44, nom: 'Agence INEZGANE EL JIHADIA' },
+                            { id: 45, nom: 'Agence TIKIOUINE' },
+                            { id: 46, nom: 'Agence BENSERGOU'},
+                            { id: 47, nom: 'Agence INZEGANE KSIMA'},
+                            { id: 48, nom: 'Agence DCHEIRA'},
+                            { id: 49, nom: 'Agence AGADIR ERAC'},
+                            { id: 50, nom: 'Agence INEZGANE TARRAST'},
+                            { id: 51, nom: 'Agence AOURIR'},
+                            { id: 52, nom: 'Agence TADDART'},
+                            { id: 53, nom: 'Agence AGADIR HAY MOHAMMADI'},
+                            { id: 54, nom: 'Agence AGADIR SALAM ' },
+                            { id: 55, nom: 'Agence DRARGA'}
+                        ],
+                        6: [
+                            { id: 56, nom: 'Agence OUARZAZATE' },
+                            { id: 57, nom: 'Agence TINGHIR' },
+                            { id: 58, nom: 'Agence KELAA MEGOUNA' },
+                            { id: 59, nom: 'Agence BOUMALENE' },
+                            { id: 60, nom: 'Agence ZAGOURA' },
+                            { id: 61, nom: 'Agence TAZNAKHT' },
+                            { id: 62, nom: 'Agence SKOURA' },
+                            { id: 63, nom: 'Agence GM BOUMALENE' },
+                            { id: 64, nom: 'Agence GM ZAGORA' },
+                            { id: 65, nom: 'Agence GM OUARZAZATE' },
+                            { id: 66, nom: 'Agence ALNIF' },
+                            { id: 67, nom: 'Agence TARMIKT ' }
+
+                        ],
+                        7: [
+                            { id: 68, nom: 'Agence TIZNIT HASSAN II' },
+                            { id: 69, nom: 'Agence TIZNIT MASJID' },
+                            { id: 70, nom: 'Agence SIDI IFNI' },
+                            { id: 71, nom: 'Agence TANTAN' },
+                            { id: 72, nom: 'Agence MASSA' },
+                            { id: 73, nom: 'Agence BELFAA' },
+                            { id: 74, nom: 'Agence GUELMIM ESSAADYN' },
+                            { id: 75, nom: 'Agence TATA' },
+                            { id: 76, nom: 'Agence GM BOUIZAKARNE' },
+                            { id: 77, nom: 'Agence TIZNIT BIR ANZARAN' }
+                        ],
+                        8: [
+                            { id: 78, nom: 'Agence TAROUDANTE SIDI HSSAINE' },
+                            { id: 79, nom: 'Agence OULAD TEIMA CENTRE' },
+                            { id: 80, nom: 'Agence OULAD BERHIL' },
+                            { id: 81, nom: 'Agence AIT IZZA' },
+                            { id: 82, nom: 'Agence AOULOUZ' },
+                            { id: 83, nom: 'Agence TAROUDANT LABLALIAA' },
+                            { id: 84, nom: 'Agence TALIOUINE' },
+                            { id: 85, nom: 'Agence SEBT EL GUERDANE' },
+                            { id: 86, nom: 'Agence OULAD TEIMA RTIM' },
+                            { id: 87, nom: 'Agence GM OULED BERHIL' },
+                            { id: 88, nom: 'Agence GM AOULOUZ' },
+                            { id: 89, nom: 'Agence CHRARDA' }
+                        ],
+                        9: [
+                            { id: 90, nom: 'Agence LAAYOUNE BOUKRAA' },
+                            { id: 91, nom: 'Agence SMARA' },
+                            { id: 92, nom: 'Agence BOUJDOUR' },
+                            { id: 93, nom: 'Agence DAKHLA MASJID' },
+                            { id: 94, nom: 'Agence LAAYOUNE EL AMAL' },
+                            { id: 95, nom: 'Agence DAKHLA AL WAHDA' },
+                            { id: 96, nom: 'Agence LAAYOUNE PLAYA' },
+                            { id: 97, nom: 'Agence LAAYOUNE AL QODS' },
+                            { id: 98, nom: 'Agence LAAYOUNE MOULAY RACHID' }
+                        ],
+                        10: [
+                            { id: 99, nom: 'Agence AIT MELLOUL HASSAN II' },
+                            { id: 100, nom: 'Agence BIOUGRA' },
+                            { id: 101, nom: 'Agence LQLIAA' },
+                            { id: 102, nom: 'Agence AIT AMIRA CENTRE' },
+                            { id: 103, nom: 'Agence SIDI BIBI' },
+                            { id: 104, nom: 'Agence AIT BAHA' },
+                            { id: 105, nom: 'Agence AIT MELLOUL TAMSSIA' },
+                            { id: 106, nom: 'Agence AIT MELLOUL AL HOUDA' },
+                            { id: 107, nom: 'Agence LQLIAA OUFLA' },
+                            { id: 108, nom: 'Agence AIT MELLOUL AZROU' }
+                        ],
+                        11: [
+                            { id: 109, nom: 'Agence OUJDA MEDINA' },
+                            { id: 110, nom: 'Agence OUJDA OUED NACHEF' },
+                            { id: 111, nom: 'Agence JERRADA' },
+                            { id: 112, nom: 'Agence OUJDA MY HASSAN' },
+                            { id: 113, nom: 'Agence OUJDA KOULOUCHE' },
+                            { id: 114, nom: 'Agence BOUAARFA' },
+                            { id: 115, nom: 'Agence OUJDA LAZARET' },
+                            { id: 116, nom: 'Agence OUJDA HAY SALAM' },
+                            { id: 117, nom: 'Agence OUJDA SIDI YAHYA' },    
+                            { id: 118, nom: 'Agence FIGUIG' },
+                            { id: 119, nom: 'Agence GM BOUARFA' }
+                        ],
+                        12: [
+                            { id: 120, nom: 'Agence NADOR AL HOUCEIMA' },
+                            { id: 121, nom: 'Agence IMZOUREN' },
+                            { id: 122, nom: 'Agence AROUI' },
+                            { id: 123, nom: 'Agence SELOUANE' },
+                            { id: 124, nom: 'Agence DRIOUCH' },
+                            { id: 125, nom: 'Agence NADOR MARCHICA' },
+                            { id: 126, nom: 'Agence NADOR QUARTIER MILITAIRE' },
+                            { id: 127, nom: 'Agence NADOR ZEGHANGHAN' },
+                            { id: 128, nom: 'Agence BENI ANSAR' },
+                            { id: 129, nom: 'Agence FARKHANA' },
+                            { id: 130, nom: 'Agence MIDAR' },
+                            { id: 131, nom: 'Agence JAADAR' },
+                            { id: 132, nom: 'Agence KARIAT ARKAMAN' },
+                            { id: 133, nom: 'Agence TAMSAMANE' }
+                        ],
+                        13: [
+                            { id: 134, nom: 'Agence TAZA ANOUAL' },
+                            { id: 135, nom: 'Agence GUERCIF SIDI MOUSSA' },
+                            { id: 136, nom: 'Agence TAZA MOULAY YOUSSEF' },
+                            { id: 137, nom: 'Agence GUERCIF IBNOU KHALDOUN'},
+                            { id: 138, nom: 'Agence TAHLA'},
+                            { id: 139, nom: 'Agence TAZA RIBAT EL KHIR'},
+                            { id: 140, nom: 'Agence OUED AMLIL'},
+                            { id: 141, nom: 'Agence TAZA MASSIRA'},
+                            { id: 142, nom: 'Agence GM OUED AMLIL'}
+                        ],
+                        14: [
+                            { id: 143, nom: 'Agence BERKANE CENTRE' },
+                            { id: 144, nom: 'Agence TAOURIRT CENTRE' },
+                            { id: 145, nom: 'Agence LAAYOUNE ORIENTALE' },
+                            { id: 146, nom: 'Agence AHFIR'},
+                            { id: 147, nom: 'Agence ZAIO'},
+                            { id: 148, nom: 'Agence BERKANE SIDI SLIMANE'},
+                            { id: 149, nom: 'Agence BERKANE IBNOU SINA'},
+                            { id: 150, nom: 'Agence BENI DRAR'},
+                            { id: 151, nom: 'Agence AKLIM'},
+                            { id: 152, nom: 'Agence TAOURIRT MLY ALI CHERIF'},
+                            { id: 153, nom: 'Agence MADAGH'}
+                        ],
+                        15: [
+                            { id: 154, nom: 'Agence CASA BERNOUSSI' },
+                            { id: 155, nom: 'Agence CASA SIDI MOUMEN' },
+                            { id: 156, nom: 'Agence CASA AZHAR' },
+                            { id: 157, nom: 'Agence CASA AMAL'},
+                            { id: 158, nom: 'Agence CASA JAOUHARA'},
+                            { id: 159, nom: 'Agence CASA ANASSI '},
+                            { id: 160, nom: 'Agence CASABLANCA AIN SBAA'},
+                            { id: 161, nom: 'Agence CASA BERNOUSSI MOUBARAKA'},
+                            { id: 162, nom: 'Agence CASA AL OTTOUR'}
+                    	
+                
+                       ],
+                       16: [
+                           { id: 163, nom: 'Agence AIN HARROUDA' },
+                           { id: 164, nom: 'Agence MEDIOUNA' },
+                           { id: 165, nom: 'Agence TIT MELLIL	' },
+                           { id: 166, nom: 'Agence MOHAMMEDIA DERB CHABAB'},
+                           { id: 167, nom: 'Agence MOHAMMEDIA KASBAH'},
+                           { id: 168, nom: 'Agence EL MANSOURIA '},
+                           { id: 169, nom: 'Agence AIN HARROUDA CHELLALATE'},
+                           { id: 170, nom: 'Agence MOHAMMEDIA ROUTE SOUSS'}
+                    	
+                  
+                       ],
+                       17: [
+                           { id: 171, nom: 'Agence MOHAMMEDIA KHATTABI' },
+                           { id: 172, nom: 'Agence BENSLIMANE NEJMA ' },
+                           { id: 173, nom: 'Agence MOHAMMEDIA HASSANIA' },
+                           { id: 174, nom: 'Agence MOHAMMEDIA LOUIZIA'},
+                           { id: 175, nom: 'Agence BENSLIMANE AL MOHAMMADI'},
+                           { id: 176, nom: 'Agence MOHAMMEDIA EL OUAHDA '},
+                           { id: 177, nom: 'Agence GM BENSLIMANE NEJMA'},
+                           { id: 178, nom: 'Agence MOHAMMEDIA RIAD ESSALLAM'}
+                    	
+                  
+                       ],
+                       18: [
+                           { id: 179, nom: 'Agence CASA BEN MSIK' },
+                           { id: 180, nom: 'Agence CASA OMAR BEN KHATTAB ' },
+                           { id: 181, nom: 'Agence MOHAMMEDIA HASSANIA' },
+                           { id: 182, nom: 'Agence CASA SALMIYA'},
+                           { id: 183, nom: 'Agence CASA MABROUKA'},
+                           { id: 184, nom: 'Agence CASA SBATA '},
+                           { id: 185, nom: 'CASA LAHRAOUIYINE'},
+                           { id: 186, nom: 'CASA HAY FARAH'}
+                    	
+                  
+                       ],
+                       19: [
+                           { id: 187, nom: 'Agence CASA KOREA' },
+                           { id: 188, nom: 'Agence CASA ZIRAOUI ' },
+                           { id: 189, nom: 'Agence CASA DERB BALADIA' },
+                           { id: 190, nom: 'Agence CASA PALMIER'},
+                           { id: 191, nom: 'Agence CASA AIN CHOK'},
+                           { id: 192, nom: 'Agence CASA BENJDIA '},
+                           { id: 193, nom: 'Agence CASA LAHJAJMA'},
+                           { id: 194, nom: 'Agence BINELEMDOUNE'}
+                    	
+                  
+                       ],
+                       20: [
+                           { id: 195, nom: 'Agence CASA HAY MOHAMMADI' },
+                           { id: 196, nom: 'Agence CASA HAY EL FALLAH ' },
+                           { id: 197, nom: 'Agence CASA HAY ADIL' },
+                           { id: 198, nom: 'Agence SIDI MOUMEN LALLA ASMAA'},
+                           { id: 199, nom: 'Agence CASA MOULAY RCHID'},
+                           { id: 200, nom: 'Agence CASA ATTACHAROUK '},
+                           { id: 201, nom: 'Agence CASA HAY MOHAMEDI SAADA'},
+                           { id: 202, nom: 'Agence CASA GRANDE CEINTURE'}
+                    	
+                  
+                       ],
+                       21: [
+                           { id: 203, nom: 'Agence AZEMMOUR MEDINA' },
+                           { id: 203, nom: 'Agence HAD OULED FREJ ' },
+                           { id: 204, nom: 'Agence TNINE CHTOUKA' },
+                           { id: 205, nom: 'Agence AZEMMOUR SIDI ALI'},
+                           { id: 206, nom: 'Agence EL JADIDA SIDI MOUSSA'},
+                           { id: 207, nom: 'Agence EL JADIDA KALAA '},
+                           { id: 208, nom: 'Agence GM AZEMMOUR'},
+                           { id: 209, nom: 'Agence EL JADIDA ESSALAM'},
+                           { id: 210, nom: 'Agence BIR JDID RIAD'},
+                           { id: 211, nom: 'Agence AOUNATE  '}
+
+                    	
+                  
+                ],
+                 22: [
+                           { id: 212, nom: 'Agence EL JADIDA BOUCHRIT' },
+                           { id: 213, nom: 'Agence TNINE GHARBIA ' },
+                           { id: 214, nom: 'Agence EL OUALIDIA' },
+                           { id: 215, nom: 'Agence EL JADIDA MOUILHA'},
+                           { id: 215, nom: 'Agence MY ABDELLAH AMGHAR'},
+                           { id: 216, nom: 'Agence OULED GHANEM '},
+                           { id: 217, nom: 'Agence HAD OULED ISSA'},
+                           { id: 218, nom: 'Agence EL JADIDA AMAL'},
+                           { id: 219, nom: 'Agence OULED HCEINE'},
+                           { id: 220, nom: 'Agence EL JADIDA ESSAFAA '},
+                           { ID: 221, nom: 'Agence LAAKARTA'}
+
+                    	
+                  
+                ],
+                23: [
+                           { id: 222, nom: 'Agence SIDI BENNOUR' },
+                           { id: 223, nom: 'Agence YOUSSOUFIA ' },
+                           { id: 224, nom: 'Agence ZAOUIAT SIDI SMAIL' },
+                           { id: 225, nom: 'Agence KHMISS ZMAMRA'},
+                           { id: 226, nom: 'Agence JEMAAT SHAIM'},
+                           { id: 227, nom: 'Agence OULED AMRANE '},
+                           { id: 228, nom: 'Agence TLAT BOUGUEDRA '},
+                           { id: 229, nom: 'Agence SIDI BENNOUR ESSAADA'},
+                           { id: 230, nom: 'Agence ZEMAMRA NEHDA'},
+                           { id: 231, nom: 'Agence GM YOUSSOUFIA '},
+                           { ID: 232, nom: 'Agence YOUSSOUFIA LIRAK'}
+
+                    	
+                  
+                ],
+                24: [
+                           { id: 233, nom: 'Agence SAFI SIDI OUASSEL' },
+                           { id: 234, nom: 'Agence SAFI BIADA ' },
+                           { id: 235, nom: 'Agence SEBT GZOULA' },
+                           { id: 236, nom: 'Agence SAFI AZIB DERII'},
+                           { id: 237, nom: 'Agence SAFI BLED EL JED'},
+                           { id: 238, nom: 'Agence TNINE LAGHYATE '},
+                           { id: 239, nom: 'Agence SAFI QUARTIER ANAS '},
+                           { id: 240, nom: 'Agence SAFI MITFAH EL KHEIR'},
+                           { id: 241, nom: 'Agence SAFI AL MATAR'},
+                           { id: 242, nom: 'Agence SAFI MASSIRA '},
+                           { ID: 243, nom: 'Agence SAFI OUED EL BACHA'},
+                           { ID: 244, nom: 'Agence GM KAID SI AISSA'}
+
+                    	
+                  
+                ],
+                25: [
+                           { id: 245, nom: 'Agence AIT OURIR' },
+                           { id: 246, nom: 'Agence TAHANAOUT ' },
+                           { id: 247, nom: 'Agence SIDI RAHAL' },
+                           { id: 248, nom: 'Agence CHOUITER'},
+                           { id: 249, nom: 'Agence TNINE OURIKA'},
+                           { id: 250, nom: 'Agence TASSELTANT '},
+                           { id: 251, nom: 'Agence TAMASLOUHT '},
+                           { id: 252, nom: 'Agence SIDI ABDELLAH GHIAT'}
+                                               	
+                  
+                ],
+                26: [
+                           { id: 252, nom: 'Agence CHICHAOUA' },
+                           { id: 253, nom: 'Agence ESSAOUIRA AL AKABA ' },
+                           { id: 254, nom: 'Agence OUDAYA' },
+                           { id: 255, nom: 'Agence IMINTANOUTE'},
+                           { id: 256, nom: 'Agence TMANAR'},
+                           { id: 257, nom: 'Agence TLAT EL HANCHANE '},
+                           { id: 258, nom: 'Agence GM TLAT HANCHAN '},
+                           { id: 259, nom: 'Agence SID LMOUKHTAR'}
+                                               	
+                  
+                ],
+                27: [
+                           { id: 260, nom: 'Agence BENGUERIR' },
+                           { id: 261, nom: 'Agence KELAA SRAGHNA ' },
+                           { id: 262, nom: 'Agence DEMNAT' },
+                           { id: 263, nom: 'Agence ATTAOUIA '},
+                           { id: 264, nom: 'Agence TAMLALT'},
+                           { id: 265, nom: 'Agence TANANT '},
+                           { id: 266, nom: 'Agence SIDI BOUATHMANE '},
+                           { id: 267, nom: 'Agence SID LMOUKHTAR'}
+                                               	
+                  
+                ],
+                28: [
+                           { id: 268, nom: 'Agence MARRAKECH S.Y.B.A' },
+                           { id: 269, nom: 'Agence MARRAKECH MASSIRA ' },
+                           { id: 270, nom: 'Agence MARRAKECH MEDINA' },
+                           { id: 271, nom: 'Agence MARRAKECH MHAMID '},
+                           { id: 272, nom: 'Agence MARRAKECH AZLI'},
+                           { id: 273, nom: 'Agence MARRAKECH ENNAKHIL '},
+                           { id: 274, nom: 'Agence MARRAKECH DAOUDIATE '},
+                           { id: 275, nom: 'Agence MARRAKECH AZZOUZIA'},
+                           { id: 276, nom: 'Agence MARRAKECH HAY EL MOHAMMADI'},
+                           { id: 277, nom: 'Agence MARRAKECH CHARAF'}
+                                               	
+                  
+                ],
+                29: [
+                           { id: 278, nom: 'Agence SETTAT MABROUKA' },
+                           { id: 279, nom: 'Agence BERRECHID LAKDIM ' },
+                           { id: 280, nom: 'Agence DAROUA' },
+                           { id: 281, nom: 'Agence SETTAT MIMOUNA '},
+                           { id: 282, nom: 'Agence BERRECHID MOHAMMED V'},
+                           { id: 283, nom: 'Agence OULED ABBOU '},
+                           { id: 284, nom: 'Agence GM SETTAT MIMOUNA '},
+                           { id: 285, nom: 'Agence GUESSER CENTRE'}
+                                               	
+                  
+                ],
+                30: [
+                           { id: 286, nom: 'Agence HAD SWALEM' },
+                           { id: 287, nom: 'Agence CASA NASSIM ' },
+                           { id: 288, nom: 'Agence CASA LISSASFA' },
+                           { id: 289, nom: 'Agence BOUSKOURA '},
+                           { id: 290, nom: 'Agence CASA SIDI MAAROUF'},
+                           { id: 291, nom: 'Agence CASA RAHMA  '},
+                           { id: 292, nom: 'Agence CASA SIDI MAAROUF '}
+                                                             	
+                  
+                ],
+                31: [
+                           { id: 293, nom: 'Agence CASA HAY HASSANI ' },
+                           { id: 294, nom: 'Agence CASA EL OULFA ' },
+                           { id: 295, nom: 'Agence CASA WIFAK' },
+                           { id: 296, nom: 'Agence CASA CASA FERDAOUS '},
+                           { id: 297, nom: 'Agence CASA HAY HASSANI II'},
+                           { id: 298, nom: 'Agence CASA FARAH ESSALAM '},
+                           { id: 299, nom: 'Agence CASA SAAD EL KHIR '},
+                           { id: 300, nom: 'Agence CASA EL OULFA OUAD TANSIFT '},
+                           { id: 301, nom: 'Agence CASA RIAD EL OUALFA '}
+                                                             	
+                  
+                ],
+                32: [
+                           { id: 202, nom: 'Agence KOURIBGA ZELLAKA ' },
+                           { id: 203, nom: 'Agence FKIH BEN SALEH CENTRE ' },
+                           { id: 204, nom: 'Agence BEN AHMED' },
+                           { id: 205, nom: 'Agence EL BROUJ '},
+                           { id: 206, nom: 'Agence KHOURIBGA CENTRE'},
+                           { id: 207, nom: 'Agence OUED ZEM MAKRAT '},
+                           { id: 208, nom: 'Agence BENIKHIRANE '},
+                           { id: 209, nom: 'Agence GM BOUJNIBA '},
+                           { id: 210, nom: 'Agence FKIH BEN SALEH SIDI CHANAN '},
+                           { id: 211, nom: 'Agence BOUJNIBA '},
+                           { id: 212, nom: 'Agence OUED ZEM MOHAMED V '},
+                           { id: 213, nom: 'Agence KHOURIBGA NAHDA '},
+                           { id: 214, nom: 'Agence SIDI HAJJAJ'}
+
+
+                ],
+                33: [
+                           { id: 215, nom: 'Agence BENI MELLAL HAY HASSANI ' },
+                           { id: 216, nom: 'Agence BENI MELLAL ERRAMZ ' },
+                           { id: 217, nom: 'Agence KASBA TADLA AIT AMER' },
+                           { id: 218, nom: 'Agence OULED M BAREK '},
+                           { id: 219, nom: 'Agence BRADIYA'},
+                           { id: 220, nom: 'Agence ABOU JAAD '},
+                           { id: 221, nom: 'Agence BENI MELLAL MEDINA '},
+                           { id: 222, nom: 'Agence GM TAGZIRT '},
+                           { id: 223, nom: 'Agence BENI MELLAL EL MOURABITINE '},
+                           { id: 224, nom: 'Agence TAGZIRT '}
+
+
+                ],
+                34: [
+                           { id: 225, nom: 'Agence KHENIFRA CENTRE ' },
+                           { id: 226, nom: 'Agence MRIRET ' },
+                           { id: 227, nom: 'Agence KSIBA' },
+                           { id: 228, nom: 'Agence ZAOUIAT CHIKH '},
+                           { id: 229, nom: 'Agence KHENIFRA ZERKTOUNI'},
+                           { id: 230, nom: 'Agence AIT ISHAK '},
+                           { id: 231, nom: 'Agence AGALMOUS ATTAKADOUM '},
+                           { id: 232, nom: 'Agence MOULAY BOUAZZA '},
+                           { id: 233, nom: 'Agence KAF NSOUR SIDI LAMINE '},
+                           { id: 234, nom: 'Agence AGHBALA  '},
+                           { id: 235, nom: 'Agence TIGHESSALINE  '}
+
+
+                ],
+                35: [
+                           { id: 236, nom: 'Agence SOUK SEBT NAJAT ' },
+                           { id: 237, nom: 'Agence AZILAL ' },
+                           { id: 238, nom: 'Agence OULED AYAD' },
+                           { id: 239, nom: 'Agence AFOURAR '},
+                           { id: 240, nom: 'Agence DAR OULED ZIDOUH'},
+                           { id: 241, nom: 'Agence SOUK SEBT SIDI AISSA '},
+                           { id: 242, nom: 'Agence LAAYAYTA '},
+                           { id: 243, nom: 'Agence GM AZILAL '},
+                           { id: 244, nom: 'Agence AITATTAB '},
+                           { id: 245, nom: 'Agence OUAOUIZERT  '}
+
+
+                ],
+                36: [
+                           { id: 246, nom: 'Agence FES ATLAS ' },
+                           { id: 247, nom: 'Agence FES BENSOUDA ' },
+                           { id: 248, nom: 'Agence SEFROU' },
+                           { id: 249, nom: 'Agence FES NARJIS '},
+                           { id: 250, nom: 'Agence FES ZOUAGHA'},
+                           { id: 251, nom: 'Agence FES ESSAADA '},
+                           { id: 252, nom: 'Agence FES OUINAT HAJJAJ '},
+                           { id: 253, nom: 'Agence FES OULED ETAIB '},
+                           { id: 254, nom: 'Agence FES EL MASSIRA '},
+                           { id: 255, nom: 'Agence IMOUZZER KANDAR  '},
+                           { id: 256, nom: 'Agence GM SEFROU   '},
+                           { id: 257, nom: 'Agence FES DOKKARAT  '},
+                           { id: 258, nom: 'Agence FES MONTFLEURY  '},
+                           { id: 259, nom: 'Agence AIN CHKEF  '},
+                           { id: 260, nom: 'Agence SEFROU CENTRE  '}
+
+
+                ],
+                37: [
+                           { id: 261, nom: 'Agence MEKNES RIAD ' },
+                           { id: 262, nom: 'Agence MEKNES ZITOUNE ' },
+                           { id: 263, nom: 'Agence AZROU' },
+                           { id: 264, nom: 'Agence EL HAJEB '},
+                           { id: 265, nom: 'Agence BOUFAKRANE'},
+                           { id: 266, nom: 'Agence MEKNES SIDI BOUEZKRI '},
+                           { id: 267, nom: 'Agence MEKNES MARJANE '},
+                           { id: 268, nom: 'Agence GM EL HAJEB '},
+                           { id: 269, nom: 'Agence MEKNES KORTOBA '}
+
+
+                ],
+                38: [
+                           { id: 270, nom: 'Agence ERRACHIDIA  CENTRE  ' },
+                           { id: 271, nom: 'Agence MIDELT ' },
+                           { id: 272, nom: 'Agence ERFOUD' },
+                           { id: 273, nom: 'Agence RISSANI  '},
+                           { id: 274, nom: 'Agence ERRICH'},
+                           { id: 275, nom: 'Agence TINJDAD '},
+                           { id: 276, nom: 'Agence GOULMIMA '},
+                           { id: 277, nom: 'Agence GM MIDELT '},
+                           { id: 278, nom: 'Agence ERRACHIDIA TARGA '},
+                           { id: 278, nom: 'Agence BENI TADJIT '}
+
+
+                ],
+                39: [
+                           { id: 279, nom: 'Agence TAOUNATE  ' },
+                           { id: 280, nom: 'Agence FES BAB FTOUH ' },
+                           { id: 281, nom: 'Agence KARYA BA MOHAMMED' },
+                           { id: 282, nom: 'Agence FES BEN DEBBAB  '},
+                           { id: 283, nom: 'Agence TISSA'},
+                           { id: 284, nom: 'Agence FES DHAR LKHMISS '},
+                           { id: 285, nom: 'Agence GHAFSSAY '},
+                           { id: 286, nom: 'Agence GM KARYA BA MOHAMMED '},
+                           { id: 287, nom: 'Agence GM TAOUNATE '},
+                           { id: 288, nom: 'Agence AIN AICHA '},
+                           { id: 289, nom: 'Agence OUED FES '}
+
+
+                ],
+                40: [
+                           { id: 290, nom: 'Agence MEKNES BORJ MY OMAR  ' },
+                           { id: 291, nom: 'Agence MEKNES MEDINA ' },
+                           { id: 292, nom: 'Agence TAOUJTATE' },
+                           { id: 293, nom: 'Agence MEKNES OUISLANE  '},
+                           { id: 294, nom: 'Agence MLY DRISS ZARHOUN'},
+                           { id: 295, nom: 'Agence SBAA AYOUNE '},
+                           { id: 296, nom: 'Agence MEKNES TOULAL '},
+                           { id: 297, nom: 'Agence MEKNES EL BASSATINE '},
+                           { id: 298, nom: 'Agence MEKNES WIFAK '}
+
+
+                ],
+                41: [
+                           { id: 299, nom: 'Agence RABAT YACOUB EL MANSOUR  ' },
+                           { id: 300, nom: 'Agence RABAT OCEAN ' },
+                           { id: 301, nom: 'Agence RABAT MANAL' },
+                           { id: 302, nom: 'Agence RABAT EL KIFEH  '},
+                           { id: 303, nom: 'Agence RABAT AKKARI'},
+                           { id: 304, nom: 'Agence RABAT ESSALAM '},
+                           { id: 305, nom: 'Agence RABAT AL MOUSTAKBAL '}
+                    
+
+
+                ],
+                42: [
+                           { id: 306, nom: 'Agence RABAT ENNAHDA  ' },
+                           { id: 307, nom: 'Agence TEMARA MASSIRA ' },
+                           { id: 308, nom: 'Agence TEMARA CENTRE' },
+                           { id: 309, nom: 'Agence RABAT YOUSSOUFIA  '},
+                           { id: 310, nom: 'Agence TEMARA MAGHREB AL ARABI '},
+                           { id: 311, nom: 'Agence RABAT ATTAKADOUM '},
+                           { id: 312, nom: 'Agence TEMARA NAHDA '},
+                           { id: 313, nom: 'Agence TEMARA KHATTABI '},
+                           { id: 314, nom: 'Agence TEMARA EL FADILA '}
+                    
+
+
+                ],
+                43: [
+                           { id: 315, nom: 'Agence KHEMISSET IBN BATTOUTTA  ' },
+                           { id: 316, nom: 'Agence TIFELT BENSMIME ' },
+                           { id: 317, nom: 'Agence TIFLET FARAH' },
+                           { id: 318, nom: 'Agence KHEMISSET YASSMINE  '},
+                           { id: 319, nom: 'Agence MAAZIZ '},
+                           { id: 320, nom: 'Agence GM TIFELT FARAH '},
+                           { id: 321, nom: 'Agence SIDI ALLAL BAHRAOUI NASSR '},
+                           { id: 322, nom: 'Agence TIFLET RACHAD '},
+                           { id: 323, nom: 'Agence KHEMISSET AL IMANE '}
+                    
+
+
+                ],
+                44: [
+                           { id: 324, nom: 'Agence BOUZNIKA   ' },
+                           { id: 325, nom: 'Agence SKHIRATE ' },
+                           { id: 326, nom: 'Agence AIN AOUDA' },
+                           { id: 327, nom: 'Agence AIN ATIQ '},
+                           { id: 328, nom: 'Agence SIDI YAHIA ZAIER '},
+                           { id: 329, nom: 'Agence TEMARA MERS LKHEIR '},
+                           { id: 330, nom: 'Agence TAMESNA '},
+                           { id: 331, nom: 'Agence SKHIRAT HASSAN II '},
+                           { id: 332, nom: 'Agence AIN AOUDA OLD ZEAR '}
+                    
+
+
+                ],
+                45: [
+                           { id: 333, nom: 'Agence SALE MEDINA   ' },
+                           { id: 334, nom: 'Agence BOUKNADEL ' },
+                           { id: 335, nom: 'Agence SALE CHMAAOU' },
+                           { id: 336, nom: 'Agence SALE EL WAD '},
+                           { id: 337, nom: 'Agence SALE DAR HAMRA '},
+                           { id: 338, nom: 'Agence SALE SIDI MOUSSA '},
+                           { id: 339, nom: 'Agence SIDI TAYBI '},
+                           { id: 340, nom: 'Agence SALE SAID HAJJI  '}
+                    
+
+
+                ],
+                46: [
+                           { id: 341, nom: 'Agence SALE KARIA   ' },
+                           { id: 342, nom: 'Agence SALE INBIATE ' },
+                           { id: 343, nom: 'Agence SALE TABRIKT' },
+                           { id: 344, nom: 'Agence SALE SALAM '},
+                           { id: 345, nom: 'Agence SALE AL JADIDA '},
+                           { id: 346, nom: 'Agence SALE MOULAY SMAIL '},
+                           { id: 347, nom: 'Agence SALE KARIA DOUAR JBALA '},
+                           { id: 348, nom: 'Agence SALE BETTANA  '}
+                    
+
+
+                ],
+                 47: [
+                           { id: 349, nom: 'Agence SIDI SLIMANE CENTRE VILLE   ' },
+                           { id: 350, nom: 'Agence SIDI KACEM HAY JDID ' },
+                           { id: 351, nom: 'Agence BELKSIRI' },
+                           { id: 352, nom: 'Agence SOUK LARBAA '},
+                           { id: 353, nom: 'Agence SIDI YAHYA EL GHARB  '},
+                           { id: 354, nom: 'Agence GM SOUK LARBAA '},
+                           { id: 355, nom: 'Agence SIDI SLIMANE AGDAL '},
+                           { id: 356, nom: 'Agence SIDI KACEM ZIRARA  '},
+                           { id: 357, nom: 'Agence DAR EL GUEDDARI  '},
+                           { id: 358, nom: 'Agence SIDI SOUK LARBAA SALAM  '},
+                           { id: 359, nom: 'Agence GM SOUK LARBAA SALAM  '},
+                           { id: 360, nom: 'Agence GM SIDI KACEM  '}
+                           
+                    
+
+
+                ],
+                48: [
+                           { id: 361, nom: 'Agence KENITRA KHABAZAT   ' },
+                           { id: 362, nom: 'Agence KENITRA SAKNIA ' },
+                           { id: 363, nom: 'Agence KENITRA OULAD OUJIH' },
+                           { id: 364, nom: 'Agence KENITRA MASSIRA '},
+                           { id: 365, nom: 'Agence KENITRA BIR RAMI  '},
+                           { id: 366, nom: 'Agence KENITRA VILLE HAUTE '},
+                           { id: 367, nom: 'Agence KENITRA KASBA  '},
+                           { id: 368, nom: 'Agence SIDI ALLAL TAZI  '},
+                           { id: 369, nom: 'Agence KENITRA EL MELLAH  '}
+                           
+                    
+
+
+                ],
+            }
+        };
+
         // Initialisation
         document.addEventListener('DOMContentLoaded', function() {
             initializeDate();
@@ -359,8 +1128,8 @@
             showSuccess('Affectation sauvegardée avec succès!');
         }
 
-        // Exporter en Excel
-        function handleExport() {
+        // Exporter en Excel (Mode standalone sans serveur backend)
+        async function handleExport() {
             const formData = {
                 dateAffectation: document.getElementById('dateAffectation').value,
                 dateCreation: document.getElementById('dateCreation').value,
@@ -388,13 +1157,40 @@
             // Sauvegarder dans localStorage
             localStorage.setItem('affectationsExports', JSON.stringify(accumulatedData));
 
-            // Exporter toutes les données accumulées
+            // Export direct en Excel côté client (sans serveur backend)
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+            const filename = `affectations_accumulees_${timestamp}.xlsx`;
+            
+            // Créer le fichier Excel avec XLSX
             const ws = XLSX.utils.json_to_sheet(accumulatedData);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Affectations");
-            XLSX.writeFile(wb, "affectations_accumulees.xlsx");
+            XLSX.writeFile(wb, filename);
             
-            showSuccess('Export Excel réussi!');
+            showSuccess('Export Excel réussi! Fichier téléchargé: ' + filename);
+            
+            // Essayer de sauvegarder sur le réseau si le serveur est disponible
+            try {
+                const response = await fetch('http://localhost:3000/api/save-excel-network', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        data: accumulatedData,
+                        filename: filename.replace('.xlsx', '.csv')
+                    })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('✅ Fichier également sauvegardé sur le réseau:', result.path);
+                    showSuccess('Export Excel réussi! Fichier téléchargé et sauvegardé sur le réseau: ' + result.path);
+                }
+            } catch (networkError) {
+                console.log('ℹ️ Serveur backend non disponible, export local uniquement');
+                // Ne pas afficher d'erreur, l'export local a réussi
+            }
         }
 
         // Réinitialiser le formulaire
