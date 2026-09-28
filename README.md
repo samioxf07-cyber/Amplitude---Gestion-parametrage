@@ -1,321 +1,207 @@
-[README_INTRANET.md](https://github.com/user-attachments/files/30463920/README_INTRANET.md)
-# Page Web Intranet - Formulaire de Gestion
+# Backend Node.js - Connexion MS Access
 
-## 📋 Description
+Ce backend permet de sauvegarder les données du formulaire intranet dans une base de données Microsoft Access via ODBC.
 
-Page web intranet complète avec formulaire de gestion incluant des cascades, gestionnaires importables depuis Excel, et envoi par email.
+## Prérequis
 
-## 🎯 Fonctionnalités
+1. **Node.js** (version 14 ou supérieure)
+   - Télécharger: https://nodejs.org/
+   
+2. **Microsoft Access** (version 2010 ou supérieure)
+   
+3. **Pilote ODBC Microsoft Access**
+   - Pour Windows 64-bit: Télécharger "Microsoft Access Database Engine 2016 Redistributable"
+   - Lien: https://www.microsoft.com/en-us/download/details.aspx?id=54920
+   - Important: Choisir la version qui correspond à votre architecture Windows (32-bit ou 64-bit)
 
-### ✅ Fonctionnalités Implémentées
+## Installation
 
-1. **Cascades en 3 niveaux**
-   - Région → Supervision → Agences
-   - Activation automatique des listes dépendantes
-   - Données préchargées pour 5 régions
+1. **Naviguer vers le dossier backend**
+   ```bash
+   cd backend
+   ```
 
-2. **Gestionnaires**
-   - Liste par défaut avec 8 gestionnaires
-   - Import depuis Excel (.xlsx, .xls, .csv)
-   - Deux champs: Gestionnaire Entrant et Sortant
+2. **Installer les dépendances**
+   ```bash
+   npm install
+   ```
 
-3. **Champs Intérimaire**
-   - Agence Intérimaire (texte)
-   - Caisse Agent (1-11)
-   - Classe PV (C1, C2, C3, C4)
+## Configuration de la base de données
 
-4. **Motifs**
-   - Maladie, Congé, Bon Sortie, Formation
-   - Mission, Mutation, Départ Retraite
-   - Démission, Rupture Contrat, Absence
+### Option 1: Utiliser un fichier Access direct
 
-5. **Contact**
-   - Email (avec validation)
-   - Téléphone
-   - Agence Contact
+1. Créer un dossier `database` dans le dossier du projet
+2. Créer ou placer votre fichier Access (.accdb ou .mdb) dans ce dossier
+3. Modifier le fichier `db-config.js` avec le chemin absolu de votre fichier:
 
-6. **Statut de Traitement**
-   - 3 boutons radio colorés:
-     - 🟢 Oui (vert)
-     - 🔴 Non (rouge)
-     - 🟡 En Cours (orange)
+```javascript
+module.exports = {
+    connectionString: 'Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=C:/CHEIN/ABSOLU/votre_fichier.accdb;',
+};
+```
 
-7. **Traitement**
-   - Date de Traitement
-   - Observation (zone de texte)
+### Option 2: Utiliser un DSN système (recommandé)
 
-8. **Actions**
-   - 📧 Envoyer par Email (EmailJS)
-   - 📊 Exporter Excel (XLSX)
-   - 🔄 Réinitialiser le formulaire
+1. Ouvrir "ODBC Data Source Administrator" (64-bit)
+   - Presser Win+R, taper `odbcad32`
+   
+2. Aller dans l'onglet "User DSN" ou "System DSN"
 
-## 🚀 Installation
+3. Cliquer sur "Add" et sélectionner "Microsoft Access Driver (*.mdb, *.accdb)"
 
-### 1. Prérequis
-- Navigateur web moderne (Chrome, Firefox, Edge)
-- Connexion internet (pour EmailJS)
+4. Configurer le DSN:
+   - Data Source Name: `gestion_interim_dsn`
+   - Description: Base de données gestion intérim
+   - Sélectionner votre fichier Access via "Database..."
 
-### 2. Configuration EmailJS
+5. Modifier `db-config.js` pour utiliser le DSN:
+```javascript
+module.exports = {
+    dsn: 'gestion_interim_dsn',
+    connectionString: '' // Laisser vide si vous utilisez DSN
+};
+```
 
-Le formulaire utilise EmailJS pour l'envoi d'emails. Configuration actuelle:
-- **Service ID**: `service_upuge9d`
-- **Template ID**: `template_upuge9d`
-- **Public Key**: `nheWjZ1-MBf7R-96SEY`
-- **Email de destination**: `ssarhir@fbpmc.ma`
+## Structure de la table Access
 
-Pour modifier la configuration, éditez le fichier `intranet-formulaire.html` et modifiez la constante `EMAIL_CONFIG` dans la section JavaScript.
+Le backend créera automatiquement la table `DemandesInterim` si elle n'existe pas. La structure est:
 
-### 3. Déploiement
+| Champ | Type | Description |
+|-------|------|-------------|
+| id | AUTOINCREMENT | Clé primaire |
+| date_demande | DATE | Date de la demande |
+| region | TEXT(255) | Région |
+| supervision | TEXT(255) | Supervision |
+| agence | TEXT(255) | Agence |
+| gestionnaire_entrant | TEXT(255) | Gestionnaire entrant |
+| gestionnaire_sortant | TEXT(255) | Gestionnaire sortant |
+| agence_interimaire | TEXT(255) | Agence intérimaire |
+| caisse_agent | INTEGER | Caisse agent (1-11) |
+| classe_pv | TEXT(10) | Classe PV (C1-C4) |
+| motif | TEXT(255) | Motif de la demande |
+| piece_jointe | TEXT(255) | Nom du fichier pièce jointe |
+| email | TEXT(255) | Email de contact |
+| telephone | TEXT(50) | Téléphone |
+| agence_contact | TEXT(255) | Agence de contact |
+| statut_traitement | TEXT(50) | Statut (oui/non/encours) |
+| date_debut_interim | DATE | Date début intérim |
+| date_fin_interim | DATE | Date fin intérim |
+| jours_ouvres | INTEGER | Jours ouvrés |
+| observation | MEMO | Observations |
+| date_creation | DATETIME | Date de création (auto) |
 
-#### Option 1: Serveur local
+## Démarrage du serveur
+
+### Mode développement (avec auto-restart)
 ```bash
-# Avec Python
-python -m http.server 8000
-
-# Avec Node.js
-npx http-server
+npm run dev
 ```
 
-#### Option 2: Hébergement web
-- Uploader le fichier `intranet-formulaire.html` sur votre serveur
-- Accéder via l'URL de votre site
-
-## 📖 Utilisation
-
-### 1. Remplir le formulaire
-
-#### Étape 1: Informations Générales
-- Sélectionner la **Date Demande** (pré-remplie avec la date du jour)
-- Choisir une **Région**
-- La liste des **Supervisions** s'active automatiquement
-- Choisir une **Supervision**
-- La liste des **Agences** s'active automatiquement
-- Choisir une **Agence**
-
-#### Étape 2: Gestionnaires
-- Sélectionner un **Gestionnaire Entrant**
-- Sélectionner un **Gestionnaire Sortant**
-- (Optionnel) Importer des gestionnaires depuis Excel:
-  - Cliquer sur "Importer gestionnaires depuis Excel"
-  - Sélectionner un fichier Excel
-  - Les gestionnaires s'ajoutent automatiquement
-
-#### Étape 3: Détails Intérimaire
-- Saisir l'**Agence Intérimaire**
-- Choisir la **Caisse Agent** (1-11)
-- Choisir la **Classe PV** (C1-C4)
-
-#### Étape 4: Motifs
-- Sélectionner un **Motif** dans la liste déroulante
-
-#### Étape 5: Contact
-- Saisir l'**Email** (format validé)
-- Saisir le **Téléphone**
-- Saisir l'**Agence Contact** (optionnel)
-
-#### Étape 6: Statut de Traitement
-- Cliquer sur le bouton correspondant:
-  - 🟢 **Oui** si traité
-  - 🔴 **Non** si non traité
-  - 🟡 **En Cours** si en cours de traitement
-
-#### Étape 7: Traitement
-- Saisir la **Date de Traitement** (optionnel)
-- Ajouter des **Observations** (optionnel)
-
-### 2. Actions Disponibles
-
-#### Envoyer par Email
-- Cliquer sur le bouton "Envoyer par Email"
-- Un spinner de chargement apparaît
-- L'email est envoyé à `ssarhir@fbpmc.ma`
-- Un message de succès apparaît
-- Les données sont sauvegardées dans le localStorage
-- Le formulaire est réinitialisé
-
-#### Exporter Excel
-- Cliquer sur le bouton "Exporter Excel"
-- Le fichier Excel est téléchargé automatiquement
-- Nom du fichier: `demande_intranet_YYYY-MM-DD.xlsx`
-- Contient toutes les données du formulaire
-
-#### Réinitialiser
-- Cliquer sur le bouton "Réinitialiser"
-- Tous les champs sont vidés
-- La date du jour est réinitialisée
-- Les cascades sont réinitialisées
-
-## 📊 Structure des Données
-
-### Cascades (Région → Supervision → Agence)
-
-#### Régions (5)
-1. Région Nord
-2. Région Sud
-3. Région Est
-4. Région Ouest
-5. Région Centre
-
-#### Supervisions (12)
-- Nord: Tanger, Tétouan, Al Hoceima
-- Sud: Agadir, Marrakech, Ouarzazate
-- Est: Oujda, Nador
-- Ouest: Casablanca, Rabat
-- Centre: Fès, Meknès
-
-#### Agences (18)
-- Chaque supervision a 1-2 agences
-
-### Gestionnaires Par Défaut
-1. SARHIR SAMI
-2. EL FERDAOUS MARWA
-3. LAMHNNAD MADIHA
-4. AHMED MOHAMED
-5. FATIMA ZAHRA
-6. ABDELKARIM HASSAN
-7. NADIA BENALI
-8. KARIM TAZI
-
-### Motifs Disponibles
-- Maladie
-- Congé
-- Bon Sortie
-- Formation
-- Mission
-- Mutation
-- Départ Retraite
-- Démission
-- Rupture Contrat
-- Absence
-
-## 🎨 Personnalisation
-
-### Modifier les Cascades
-
-Pour modifier les données des cascades, éditez la constante `CASCADE_DATA` dans le fichier HTML:
-
-```javascript
-const CASCADE_DATA = {
-    regions: [
-        { id: 1, nom: 'Votre Région' },
-        // Ajouter d'autres régions
-    ],
-    supervisions: {
-        1: [
-            { id: 1, nom: 'Votre Supervision' },
-            // Ajouter d'autres supervisions
-        ],
-        // Ajouter d'autres régions
-    },
-    agences: {
-        1: [
-            { id: 1, nom: 'Votre Agence' },
-            // Ajouter d'autres agences
-        ],
-        // Ajouter d'autres supervisions
-    }
-};
+### Mode production
+```bash
+npm start
 ```
 
-### Modifier les Gestionnaires
+Le serveur démarrera sur `http://localhost:3000`
 
-Pour modifier les gestionnaires par défaut, éditez la constante `DEFAULT_GESTIONNAIRES`:
+## API Endpoints
 
-```javascript
-const DEFAULT_GESTIONNAIRES = [
-    'VOTRE GESTIONNAIRE 1',
-    'VOTRE GESTIONNAIRE 2',
-    // Ajouter d'autres gestionnaires
-];
+### Test de connexion
 ```
-
-### Modifier l'Email de Destination
-
-Pour modifier l'email de destination, éditez la constante `EMAIL_CONFIG`:
-
-```javascript
-const EMAIL_CONFIG = {
-    SERVICE_ID: 'votre_service_id',
-    TEMPLATE_ID: 'votre_template_id',
-    PUBLIC_KEY: 'votre_public_key',
-    RECIPIENT_EMAIL: 'votre@email.com'
-};
+GET /api/test
 ```
+Réponse: `{ message: "Backend fonctionne correctement", status: "OK" }`
 
-### Modifier les Couleurs
+### Sauvegarder les données du formulaire
+```
+POST /api/save-form
+Content-Type: application/json
 
-Pour modifier les couleurs des boutons radio, éditez le CSS:
-
-```css
-.radio-oui input[type="radio"]:checked + label {
-    background: #10b981; /* Vert */
-    color: white;
-    border-color: #059669;
-}
-
-.radio-non input[type="radio"]:checked + label {
-    background: #ef4444; /* Rouge */
-    color: white;
-    border-color: #dc2626;
-}
-
-.radio-encours input[type="radio"]:checked + label {
-    background: #f59e0b; /* Orange */
-    color: white;
-    border-color: #d97706;
+Body:
+{
+  "dateDemande": "2026-08-05",
+  "region": "Région Nord",
+  "supervision": "Supervision Tanger",
+  "agence": "Agence Tanger Beni Makada",
+  "gestionnaireEntrant": "SARHIR SAMI",
+  "gestionnaireSortant": "EL FERDAOUS MARWA",
+  "agenceInterimaire": "Manpower",
+  "caisseAgent": "1",
+  "classePV": "C1",
+  "motif": "Maladie",
+  "pieceJointe": "demande.pdf",
+  "email": "email@example.com",
+  "telephone": "+212 600 000 000",
+  "agenceContact": "Agence Tanger",
+  "statutTraitement": "encours",
+  "dateDebutInterim": "2026-08-10",
+  "dateTraitement": "2026-08-20",
+  "joursOuvres": "8",
+  "observation": "Observation texte"
 }
 ```
 
-## 🔧 Dépannage
+Réponse: 
+```json
+{
+  "success": true,
+  "message": "Données sauvegardées avec succès dans MS Access"
+}
+```
 
-### Problème: Les cascades ne fonctionnent pas
-**Solution**: Vérifiez que les données dans `CASCADE_DATA` sont correctement structurées avec les bons IDs.
+### Récupérer toutes les demandes
+```
+GET /api/demandes
+```
 
-### Problème: L'import Excel ne fonctionne pas
-**Solution**: Assurez-vous que le fichier Excel est au format .xlsx, .xls ou .csv et contient des données dans la première colonne.
+### Fermer la connexion DB
+```
+POST /api/disconnect
+```
 
-### Problème: L'envoi d'email échoue
-**Solution**: Vérifiez votre configuration EmailJS et votre connexion internet. Assurez-vous que les clés API sont correctes.
+## Intégration avec le formulaire
 
-### Problème: L'export Excel ne fonctionne pas
-**Solution**: Vérifiez que la bibliothèque XLSX est correctement chargée depuis le CDN.
+Le fichier `intranet-formulaire.html` a été modifié pour envoyer les données au backend:
 
-## 📱 Compatibilité
+1. Le bouton "Sauvegarder" appelle maintenant `handleSave()`
+2. Les données sont envoyées via POST à `http://localhost:3000/api/save-form`
+3. En cas de succès, les données sont sauvegardées dans MS Access
+4. En cas d'erreur, les données sont sauvegardées localement (localStorage) comme backup
 
-### Navigateurs Supportés
-- Chrome 90+
-- Firefox 88+
-- Edge 90+
-- Safari 14+
+## Dépannage
 
-### Résolutions
-- Desktop: 1024x768 minimum
-- Tablet: 768x1024 minimum
-- Mobile: 375x667 minimum (responsive)
+### Erreur: "Data source name not found"
+- Vérifiez que le pilote ODBC Access est installé
+- Vérifiez que le chemin du fichier Access est correct
+- Essayez d'utiliser un DSN système au lieu du chemin direct
 
-## 🔒 Sécurité
+### Erreur: "Could not connect to the database"
+- Vérifiez que le fichier Access n'est pas ouvert par un autre programme
+- Vérifiez les permissions sur le fichier Access
+- Assurez-vous que le pilote ODBC correspond à l'architecture de Node.js (32-bit vs 64-bit)
 
-### Données
-- Les données sont stockées localement dans le localStorage
-- Aucune donnée n'est envoyée à des serveurs tiers (sauf EmailJS)
-- Les emails sont envoyés via EmailJS sécurisé
+### Erreur: "Table does not exist"
+- Le backend créera automatiquement la table si elle n'existe pas
+- Si l'erreur persiste, vérifiez les permissions d'écriture sur le fichier Access
 
-### Recommandations
-- Utiliser HTTPS en production
-- Valider les données côté serveur
-- Implémenter une authentification pour l'accès
+### Le serveur ne démarre pas
+- Vérifiez que le port 3000 n'est pas utilisé par une autre application
+- Vérifiez que Node.js est correctement installé: `node --version`
+- Réinstallez les dépendances: `rm -rf node_modules && npm install`
 
-## 📞 Support
+## Sécurité
 
-Pour toute question ou problème, contactez l'administrateur système.
+- Ce backend est destiné à un usage intranet local
+- Pour un usage en production, ajoutez:
+  - Authentification
+  - HTTPS
+  - Validation des entrées plus stricte
+  - Rate limiting
+  - Logs d'audit
 
-## 📝 Changelog
+## Support
 
-### Version 1.0 (2026-06-30)
-- Création initiale du formulaire
-- Implémentation des cascades
-- Import Excel des gestionnaires
-- Envoi par EmailJS
-- Export Excel
-- Boutons radio colorés
-- Interface responsive avec Tailwind CSS
+En cas de problème:
+1. Vérifiez les logs du serveur dans la console
+2. Vérifiez les logs du navigateur (F12 > Console)
+3. Consultez la section Dépannage ci-dessus
